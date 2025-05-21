@@ -1,5 +1,5 @@
 import type { NavItem } from "@/types";
-import { LayoutDashboard, Settings, Accessibility } from "lucide-react";
+import { LayoutDashboard, Settings, Accessibility, FileText } from "lucide-react"; // Added FileText
 
 export type SiteConfig = {
   name: string;
@@ -26,6 +26,12 @@ export const siteConfig: SiteConfig = {
       href: "/accessibility-check",
       icon: Accessibility,
       description: "Tools and resources for accessibility.",
+    },
+    {
+      title: "Reports", // New Reports Link
+      href: "/reports",
+      icon: FileText,
+      description: "View and generate accessibility reports.",
     },
     {
       title: "Settings",
