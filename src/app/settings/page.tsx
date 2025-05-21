@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch"; // Added Switch import
+import { Switch } from "@/components/ui/switch";
 import { 
   Fingerprint, 
   Palette, 
@@ -19,9 +19,9 @@ import {
   ListChecks,
   TrendingUp,
   ScrollText,
-  UserCircle, // Added UserCircle
-  Mail, // Added Mail
-  Lock // Added Lock
+  UserCircle,
+  Mail,
+  Lock
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -29,25 +29,28 @@ import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"
 import React, { useState, useEffect } from 'react';
 import { useCredits } from "@/contexts/credit-context"; 
 
+// --- Placeholder Data (In a real app, fetch from backend/user data) ---
+const USER_SUBSCRIPTION_TIER_NAME = "Pro Plan"; 
+const MONTHLY_CREDIT_ALLOWANCE = 1000; 
+const IS_SUBSCRIPTION_HAS_ALLOWANCE = true;
+const IS_SUBSCRIPTION_HAS_RESET_DATE = true;
+const IS_TOP_UP_FEATURE_ENABLED = true;
+const IS_USER_NOT_ON_HIGHEST_TIER = true;
+// --- End Placeholder Data ---
 
 export default function SettingsPage() {
-  const { creditBalance } = useCredits(); 
+  const { creditBalance } = useCredits(); // Dynamic value from context
 
-  const userSubscriptionTierName = "Pro Plan"; 
-  const monthlyAllowanceAmount = 1000; 
-  
   const [nextResetDate, setNextResetDate] = useState<string | null>(null);
 
   useEffect(() => {
+    // Calculate next reset date on the client to avoid hydration issues
     const date = new Date();
-    setNextResetDate(new Date(date.getFullYear(), date.getMonth() + 1, 1).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
+    const clientNextResetDate = new Date(date.getFullYear(), date.getMonth() + 1, 1).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    setNextResetDate(clientNextResetDate);
   }, []);
 
-  const isSubscriptionHasAllowance = true;
-  const isSubscriptionHasResetDate = true;
-  const isTopUpFeatureEnabled = true;
-  const isUserNotOnHighestTier = true;
-
+  // Modal state (remains for potential future use, though not directly used by this refactor for display)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState<() => void>(() => {});
   const [modalCreditsRequired, setModalCreditsRequired] = useState(0);
@@ -106,19 +109,19 @@ export default function SettingsPage() {
             <ul className="space-y-2 text-sm">
               <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
                 <span className="font-medium text-muted-foreground flex items-center gap-1.5"><Award className="h-4 w-4" />Subscription Tier:</span>
-                <Badge variant="secondary">{userSubscriptionTierName}</Badge>
+                <Badge variant="secondary">{USER_SUBSCRIPTION_TIER_NAME}</Badge>
               </li>
-              {isSubscriptionHasAllowance && (
+              {IS_SUBSCRIPTION_HAS_ALLOWANCE && (
                 <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
                   <span className="font-medium text-muted-foreground flex items-center gap-1.5"><CalendarDays className="h-4 w-4" />Monthly Credit Allowance:</span>
-                  <span>{monthlyAllowanceAmount.toLocaleString()}</span>
+                  <span>{MONTHLY_CREDIT_ALLOWANCE.toLocaleString()}</span>
                 </li>
               )}
               <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
                 <span className="font-medium text-muted-foreground flex items-center gap-1.5"><Coins className="h-4 w-4" />Remaining Credits:</span>
                 <span className="font-semibold text-lg text-primary">{creditBalance.toLocaleString()}</span>
               </li>
-              {isSubscriptionHasResetDate && nextResetDate && (
+              {IS_SUBSCRIPTION_HAS_RESET_DATE && nextResetDate && (
                 <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
                   <span className="font-medium text-muted-foreground flex items-center gap-1.5"><History className="h-4 w-4" />Credits Reset On:</span>
                   <span>{nextResetDate}</span>
@@ -128,12 +131,12 @@ export default function SettingsPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            {isTopUpFeatureEnabled && (
+            {IS_TOP_UP_FEATURE_ENABLED && (
               <Button variant="default" onClick={() => console.log("Initiate credit purchase flow")}>
                 <Coins className="mr-2 h-4 w-4" /> Top-up Credits
               </Button>
             )}
-            {isUserNotOnHighestTier && (
+            {IS_USER_NOT_ON_HIGHEST_TIER && (
               <Button variant="outline" onClick={() => console.log("Navigate to subscription upgrade page")}>
                 <TrendingUp className="mr-2 h-4 w-4" /> Upgrade Subscription
               </Button>
@@ -243,12 +246,13 @@ export default function SettingsPage() {
         <Button variant="default" disabled>Save Changes (Disabled)</Button>
       </div>
 
+      {/* CreditConfirmationModal is kept for completeness, though not directly triggered by settings page actions */}
       <CreditConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={modalAction}
         creditsRequired={modalCreditsRequired}
-        currentCredits={creditBalance}
+        currentCredits={creditBalance} // Uses dynamic creditBalance from context
         onTopUp={() => {
           setIsModalOpen(false);
           const topUpSection = document.getElementById('credits-subscription');
@@ -265,4 +269,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-
