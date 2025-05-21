@@ -15,10 +15,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility } from "lucide-react";
+import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility, MoreVertical, HelpCircle, Info, FileText } from "lucide-react"; // Added MoreVertical, HelpCircle, Info, FileText
 import { Logo } from "./logo";
 import { CreditBalanceDisplay } from "@/components/credit-balance-display";
-import { NotificationDropdown } from "@/components/notifications/notification-dropdown"; // Added import
+import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
 
 export function Header() {
   const placeholderCredits = 20; // Example initial credits
@@ -33,7 +33,7 @@ export function Header() {
           </div>
         </div>
 
-        <div className="flex items-center gap-x-2 sm:gap-x-3"> {/* Adjusted gap for responsiveness */}
+        <div className="flex items-center gap-x-1 sm:gap-x-2"> {/* Adjusted gap for responsiveness */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -67,7 +67,30 @@ export function Header() {
           </DropdownMenu>
 
           <CreditBalanceDisplay credits={placeholderCredits} /> 
-          <NotificationDropdown /> {/* Added NotificationDropdown */}
+          <NotificationDropdown />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="More options">
+                <MoreVertical className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => console.log("Navigate to Help/Documentation")}>
+                <HelpCircle className="mr-2 h-4 w-4" />
+                Help/Documentation
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => console.log("Navigate to Platform Status")}>
+                <Info className="mr-2 h-4 w-4" />
+                Platform Status
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => console.log("Navigate to Changelog")}>
+                <FileText className="mr-2 h-4 w-4" />
+                View Changelog
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
