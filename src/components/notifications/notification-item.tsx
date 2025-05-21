@@ -77,7 +77,7 @@ export function NotificationItem({ notification, onDismiss }: NotificationItemPr
       aria-label={`Notification: ${notification.message}. ${notification.read ? 'Read.' : 'Unread.'} Received ${formatRelativeTime(notification.timestamp)}.`}
     >
       {!notification.read && (
-        <div className="h-2 w-2 rounded-full bg-primary mt-1.5 shrink-0" aria-label="Unread notification"></div>
+        <div className="h-2.5 w-2.5 rounded-full bg-primary mt-1.5 shrink-0" aria-label="Unread notification"></div>
       )}
       <div className={cn("shrink-0 mt-0.5", notification.read && "ml-4")}>
         {getNotificationIcon(notification.type)}
