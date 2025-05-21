@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import type { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Download, PlusCircle, Settings2, Trash2, CalendarIcon, CheckCircle, Info } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
+import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
+import { Download, PlusCircle, Settings2, Trash2, CalendarIcon, Info, BarChart3, ListChecks, FileSpreadsheet, FileCode2, FileTextIcon as ReportFileIcon } from "lucide-react";
 
 // Placeholder data
 const userScannedDomains = [
@@ -45,6 +48,7 @@ export default function NewReportConfigurationUI() {
 
   const [reportGenerated, setReportGenerated] = useState(false);
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
   const handleDomainToggle = (domainName: string) => {
     setSelectedDomains(prev => 
@@ -61,10 +65,12 @@ export default function NewReportConfigurationUI() {
   const handleGenerateReport = () => {
     setGeneratingReport(true);
     setReportGenerated(false);
+    setGeneratedAt(null);
     // Simulate API call
     setTimeout(() => {
       setGeneratingReport(false);
       setReportGenerated(true);
+      setGeneratedAt(new Date());
       // In a real app, you'd fetch and display report data here
     }, 1500);
   };
@@ -79,6 +85,7 @@ export default function NewReportConfigurationUI() {
     setReportTemplate(reportTemplateOptions[0]);
     setReportName('');
     setReportGenerated(false);
+    setGeneratedAt(null);
   };
 
   return (
@@ -168,7 +175,6 @@ export default function NewReportConfigurationUI() {
               <CardTitle className="flex items-center gap-2"><Settings2 className="h-5 w-5 text-primary" />2. Filter Issues & Content</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* For multi-select, Checkbox group in Popover or custom component would be needed. Using single Select for simplicity. */}
               <div>
                 <Label htmlFor="issue-type" className="text-base font-medium">Issue Type(s) (Select one for MVP)</Label>
                  <Select onValueChange={(value) => setSelectedIssueTypes(value ? [value] : [])} value={selectedIssueTypes[0] || ""}>
@@ -256,14 +262,21 @@ export default function NewReportConfigurationUI() {
           </div>
         </div>
 
-        {/* Report Display Area Placeholder */}
+        {/* Report Display Area */}
         <div className="lg:col-span-1 space-y-6">
-          <Card className="shadow-md sticky top-24"> {/* Sticky for visibility while scrolling form */}
+          <Card className="shadow-md sticky top-24">
             <CardHeader>
               <CardTitle>Generated Report</CardTitle>
-              <CardDescription>Your report will appear here once generated.</CardDescription>
+              <CardDescription>
+                {reportGenerated ? `Custom Report: ${reportName || "Untitled Report"}` : "Your report will appear here once generated."}
+              </CardDescription>
+              {reportGenerated && generatedAt && (
+                 <p className="text-xs text-muted-foreground pt-1">
+                   Generated: {generatedAt.toLocaleString()}
+                 </p>
+              )}
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-h-[400px]"> {/* Added min-height for better placeholder visibility */}
               {generatingReport && (
                  <div className="flex items-center justify-center py-10 text-muted-foreground">
                   <div role="status" aria-live="polite">
@@ -277,25 +290,84 @@ export default function NewReportConfigurationUI() {
                 </div>
               )}
               {!generatingReport && !reportGenerated && (
-                <div className="text-center py-10 text-muted-foreground">
-                  <Info className="mx-auto h-12 w-12 mb-2" />
-                  <p>Configure your report options on the left and click "Generate Report".</p>
+                <div className="text-center py-10 text-muted-foreground flex flex-col items-center justify-center h-full">
+                  <ReportFileIcon className="mx-auto h-16 w-16 mb-4 text-primary/30" />
+                  <p className="text-lg">Configure your report options on the left.</p>
+                  <p className="text-sm">Click "Generate Report" to see the results here.</p>
                 </div>
               )}
               {reportGenerated && (
-                <Alert variant="default" className="border-green-500 bg-green-50 dark:bg-green-900/30">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  <AlertTitle className="text-green-700 dark:text-green-300">Report Generated Successfully!</AlertTitle>
-                  <AlertDescription className="text-green-600 dark:text-green-500">
-                    <p className="mt-2">Your custom report is ready. In a full implementation, the report content (tables, charts, issue details) would be displayed here.</p>
-                    <div className="mt-4 space-x-2">
-                      <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" />Export CSV</Button>
-                      <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" />Export PDF</Button>
-                      <Button variant="outline" size="sm">View HTML Report</Button>
-                    </div>
-                    <p className="text-xs mt-3">Placeholders for report content and export options.</p>
-                  </AlertDescription>
-                </Alert>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-xl font-semibold text-primary">
+                      Report Details
+                    </h3>
+                     <div className="flex gap-2">
+                        <Button variant="outline" size="sm"><FileSpreadsheet className="mr-2 h-4 w-4" />Export CSV</Button>
+                        <Button variant="outline" size="sm"><ReportFileIcon className="mr-2 h-4 w-4" />Export PDF</Button>
+                        <Button variant="outline" size="sm"><FileCode2 className="mr-2 h-4 w-4" />View HTML</Button>
+                      </div>
+                  </div>
+                  <Separator />
+                  
+                  <div>
+                    <h4 className="text-lg font-medium mb-2 flex items-center gap-2"><Info className="h-5 w-5 text-accent-foreground"/>Summary</h4>
+                    <p className="text-sm text-muted-foreground">
+                      This report covers scans for {selectedDomains.join(', ') || 'all selected domains'} 
+                      between {dateRange?.from ? format(dateRange.from, "PP") : 'N/A'} and {dateRange?.to ? format(dateRange.to, "PP") : 'N/A'}.
+                      It includes data for {selectedScanTypes.join(', ') || 'all scan types'}.
+                      Based on the '{reportTemplate}' template.
+                      Further summary details and key findings would appear here.
+                    </p>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                     <h4 className="text-lg font-medium mb-2 flex items-center gap-2"><BarChart3 className="h-5 w-5 text-accent-foreground"/>Visualizations</h4>
+                     <div className="p-4 border rounded-md bg-muted/50 min-h-[200px] flex items-center justify-center">
+                        <p className="text-muted-foreground italic">Chart placeholders - e.g., Issue Severity Breakdown, Trends.</p>
+                        {/* Example for a placeholder image: 
+                        <Image src="https://placehold.co/400x200.png" data-ai-hint="chart graph" alt="Placeholder chart" width={400} height={200} className="rounded-md" />
+                        */}
+                     </div>
+                  </div>
+
+                  <Separator />
+                  
+                  <div>
+                    <h4 className="text-lg font-medium mb-2 flex items-center gap-2"><ListChecks className="h-5 w-5 text-accent-foreground"/>Detailed Issues</h4>
+                    <Table>
+                      <TableCaption>A list of detailed issues based on your configuration.</TableCaption>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[200px]">Issue</TableHead>
+                          <TableHead>Severity</TableHead>
+                          <TableHead>Location</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {/* In a real app, map over actual issue data here */}
+                        <TableRow>
+                          <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                            Issue details would be listed here. (Placeholder)
+                          </TableCell>
+                        </TableRow>
+                        {/* Example Row:
+                        <TableRow>
+                          <TableCell className="font-medium">Missing Alt Text</TableCell>
+                          <TableCell>Critical</TableCell>
+                          <TableCell>/products/item-123</TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">Details</Button>
+                          </TableCell>
+                        </TableRow>
+                        */}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
               )}
             </CardContent>
           </Card>
