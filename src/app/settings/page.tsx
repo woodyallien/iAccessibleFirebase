@@ -1,17 +1,61 @@
+
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { ThemeToggle } from "@/components/theme-toggle"; // Import the ThemeToggle we created
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Fingerprint, Palette, Bell } from "lucide-react";
+import { 
+  Fingerprint, 
+  Palette, 
+  Bell, 
+  WalletCards, 
+  Award, 
+  CalendarDays, 
+  Coins, 
+  History,
+  ListChecks,
+  TrendingUp
+} from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"; // Import the new modal
+import React, { useState } from 'react';
+
 
 export default function SettingsPage() {
+  // Placeholder data - in a real app, this would come from user data/API
+  const userSubscriptionTierName = "Pro Plan";
+  const monthlyAllowanceAmount = 1000;
+  const userCreditBalance = 5; // Example, could be dynamic
+  const nextResetDate = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toLocaleDateString();
+  const isSubscriptionHasAllowance = true;
+  const isSubscriptionHasResetDate = true;
+  const isTopUpFeatureEnabled = true;
+  const isUserNotOnHighestTier = true;
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState<() => void>(() => {});
+  const [modalCreditsRequired, setModalCreditsRequired] = useState(0);
+
+  // Example action that would trigger the modal
+  const handleExampleScanAction = () => {
+    const creditsRequired = 10; // Example
+    setModalCreditsRequired(creditsRequired);
+    setModalAction(() => () => {
+      console.log("Scan action confirmed and processed!");
+      // Deduct credits, perform scan, etc.
+    });
+    setIsModalOpen(true);
+  };
+
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight text-foreground">Settings</h1>
 
+      {/* Appearance Card */}
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -30,7 +74,6 @@ export default function SettingsPage() {
                 Select your preferred color scheme for the interface.
               </p>
             </div>
-            {/* This is where the theme toggle is used */}
             <div id="theme-toggle-label">
               <ThemeToggle />
             </div>
@@ -44,6 +87,103 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* Credits & Subscription Card */}
+      <Card className="shadow-lg" id="credits-subscription">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <WalletCards className="h-6 w-6 text-primary" aria-hidden="true" />
+            Credits & Subscription
+          </CardTitle>
+          <CardDescription>
+            Manage your scan credits and subscription plan.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <ListChecks className="h-5 w-5 text-muted-foreground" />
+              Current Credit Status
+            </h3>
+            <ul className="space-y-2 text-sm">
+              <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
+                <span className="font-medium text-muted-foreground flex items-center gap-1.5"><Award className="h-4 w-4" />Subscription Tier:</span>
+                <Badge variant="secondary">{userSubscriptionTierName}</Badge>
+              </li>
+              {isSubscriptionHasAllowance && (
+                <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
+                  <span className="font-medium text-muted-foreground flex items-center gap-1.5"><CalendarDays className="h-4 w-4" />Monthly Credit Allowance:</span>
+                  <span>{monthlyAllowanceAmount.toLocaleString()}</span>
+                </li>
+              )}
+              <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
+                <span className="font-medium text-muted-foreground flex items-center gap-1.5"><Coins className="h-4 w-4" />Remaining Credits:</span>
+                <span className="font-semibold text-lg text-primary">{userCreditBalance.toLocaleString()}</span>
+              </li>
+              {isSubscriptionHasResetDate && (
+                <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
+                  <span className="font-medium text-muted-foreground flex items-center gap-1.5"><History className="h-4 w-4" />Credits Reset On:</span>
+                  <span>{nextResetDate}</span>
+                </li>
+              )}
+            </ul>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            {isTopUpFeatureEnabled && (
+              <Button variant="default" onClick={() => console.log("Initiate credit purchase flow")}>
+                <Coins className="mr-2 h-4 w-4" /> Top-up Credits
+              </Button>
+            )}
+            {isUserNotOnHighestTier && (
+              <Button variant="outline" onClick={() => console.log("Navigate to subscription upgrade page")}>
+                <TrendingUp className="mr-2 h-4 w-4" /> Upgrade Subscription
+              </Button>
+            )}
+          </div>
+          
+          {/* Example button to trigger the credit confirmation modal */}
+          {/* <Button variant="destructive" onClick={handleExampleScanAction} className="mt-4">
+            Test Scan Action (10 Credits)
+          </Button> */}
+
+
+          <div>
+            <h3 className="text-lg font-semibold mb-3 mt-6 flex items-center gap-2">
+                <ScrollText className="h-5 w-5 text-muted-foreground" />
+                Recent Credit Usage
+            </h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Action/Description</TableHead>
+                  <TableHead className="text-right">Credits Used</TableHead>
+                  <TableHead className="text-right">Remaining Balance</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {/* Placeholder for no data. In a real app, map over usage data here. */}
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground py-10">
+                    No credit usage history found.
+                  </TableCell>
+                </TableRow>
+                {/* Example Row (commented out):
+                <TableRow>
+                  <TableCell>2024-07-28</TableCell>
+                  <TableCell>Website Scan: example.com</TableCell>
+                  <TableCell className="text-right">-10</TableCell>
+                  <TableCell className="text-right">990</TableCell>
+                </TableRow>
+                */}
+              </TableBody>
+              <TableCaption>A summary of your recent credit transactions.</TableCaption>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Notifications Card */}
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -57,6 +197,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       
+      {/* Account Card */}
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -73,6 +214,30 @@ export default function SettingsPage() {
       <div className="mt-4 flex justify-end">
         <Button variant="default" disabled>Save Changes (Disabled)</Button>
       </div>
+
+      {/* Credit Confirmation Modal Instance */}
+      <CreditConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={modalAction}
+        creditsRequired={modalCreditsRequired}
+        currentCredits={userCreditBalance}
+        onTopUp={() => {
+          setIsModalOpen(false);
+          // In a real app, navigate to top-up section or open a top-up modal
+          const topUpSection = document.getElementById('credits-subscription');
+          if (topUpSection) topUpSection.scrollIntoView({ behavior: 'smooth' });
+          console.log("Navigate to top-up credits");
+        }}
+        onUpgrade={() => {
+          setIsModalOpen(false);
+          // In a real app, navigate to upgrade page or open an upgrade modal
+           const topUpSection = document.getElementById('credits-subscription');
+          if (topUpSection) topUpSection.scrollIntoView({ behavior: 'smooth' });
+          console.log("Navigate to upgrade subscription");
+        }}
+      />
     </div>
   );
 }
+

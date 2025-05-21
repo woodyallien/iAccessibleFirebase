@@ -1,3 +1,4 @@
+
 "use client";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -15,19 +16,23 @@ import {
 import { LogOut, UserCircle } from "lucide-react";
 import { Logo } from "./logo";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { CreditBalanceDisplay } from "@/components/credit-balance-display"; // Added import
 
 export function Header() {
   const isMobile = useIsMobile();
+  // Placeholder credit balance - in a real app, this would come from state/context/API
+  const placeholderCredits = 5; 
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="md:hidden" aria-label="Open navigation menu"/>
-          {/* Hide logo on mobile if sidebar trigger is shown, or style differently */}
           {!isMobile && <div className="hidden md:block"><Logo size="sm" /></div>}
         </div>
 
         <div className="flex items-center gap-x-3">
+          <CreditBalanceDisplay credits={placeholderCredits} /> 
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -1,11 +1,56 @@
+
+"use client"; // Added "use client" as we'll use useState for modal
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScanLine, Zap } from "lucide-react";
 import Image from "next/image";
+import React, { useState } from 'react'; // Added React and useState
+import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"; // Import the modal
 
 export default function AccessibilityCheckPage() {
+  // Placeholder credit balance and required credits - in a real app, this would come from state/context/API
+  const currentUserCredits = 5; 
+  const scanCreditsRequired = 10;
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [urlToScan, setUrlToScan] = useState("");
+
+  const handleScanAttempt = () => {
+    // Basic URL validation (optional, can be more robust)
+    if (!urlToScan || !urlToScan.startsWith("http")) {
+      // Here you might use a toast notification to inform the user
+      alert("Please enter a valid URL (e.g., https://example.com)");
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const performActualScan = () => {
+    console.log(`Scanning URL: ${urlToScan}. This would deduct ${scanCreditsRequired} credits.`);
+    // Actual scan logic and credit deduction would go here
+    // For now, just log and close modal
+    setIsModalOpen(false);
+    setUrlToScan(""); // Optionally clear the input
+  };
+
+  const handleTopUp = () => {
+    setIsModalOpen(false);
+    // For now, just log. In a real app, navigate to /settings#credits-subscription
+    window.location.href = '/settings#credits-subscription'; 
+    console.log("User wants to top-up credits.");
+  };
+
+  const handleUpgrade = () => {
+    setIsModalOpen(false);
+    // For now, just log. In a real app, navigate to upgrade page or /settings#credits-subscription
+    window.location.href = '/settings#credits-subscription';
+    console.log("User wants to upgrade subscription.");
+  };
+
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight text-foreground">Accessibility Check</h1>
@@ -17,18 +62,26 @@ export default function AccessibilityCheckPage() {
             Start a New Scan
           </CardTitle>
           <CardDescription>
-            Enter a URL to perform an automated accessibility check.
+            Enter a URL to perform an automated accessibility check. Each scan may consume credits.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="url-input" className="text-base font-medium">Website URL</Label>
-            <Input id="url-input" type="url" placeholder="https://example.com" className="mt-1" aria-describedby="url-input-description"/>
+            <Input 
+              id="url-input" 
+              type="url" 
+              placeholder="https://example.com" 
+              className="mt-1" 
+              aria-describedby="url-input-description"
+              value={urlToScan}
+              onChange={(e) => setUrlToScan(e.target.value)}
+            />
             <p id="url-input-description" className="text-sm text-muted-foreground mt-1">
-              Ensure the URL is publicly accessible.
+              Ensure the URL is publicly accessible. This scan will cost {scanCreditsRequired} credit(s).
             </p>
           </div>
-          <Button variant="default" size="lg">
+          <Button variant="default" size="lg" onClick={handleScanAttempt}>
             Scan Now <Zap className="ml-2 h-5 w-5" />
           </Button>
         </CardContent>
@@ -79,6 +132,18 @@ export default function AccessibilityCheckPage() {
           {/* Future: Table of recent scans */}
         </CardContent>
       </Card>
+
+      {/* Credit Confirmation Modal Instance */}
+      <CreditConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={performActualScan}
+        creditsRequired={scanCreditsRequired}
+        currentCredits={currentUserCredits}
+        onTopUp={handleTopUp}
+        onUpgrade={handleUpgrade}
+      />
     </div>
   );
 }
+
