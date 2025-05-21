@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility, MoreVertical, HelpCircle, Info, FileText } from "lucide-react"; // Added MoreVertical, HelpCircle, Info, FileText
+import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility, MoreVertical, HelpCircle, Info, FileText } from "lucide-react";
 import { Logo } from "./logo";
 import { CreditBalanceDisplay } from "@/components/credit-balance-display";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
