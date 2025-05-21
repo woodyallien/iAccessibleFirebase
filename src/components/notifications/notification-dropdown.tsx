@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,20 +30,23 @@ const initialMockNotifications: Notification[] = [
 export function NotificationDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>(initialMockNotifications);
   const unreadCount = notifications.filter(n => !n.read).length;
+  const router = useRouter(); // Initialize router
 
   const handleMarkAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    console.log("Mark all as read clicked");
+    // In a real app, this would also call an API to update backend state.
   };
 
   const handleViewAllNotifications = () => {
-    console.log("View all notifications clicked");
-    // In a real app, navigate to a full notifications page
-    // router.push('/notifications');
+    router.push('/notifications');
   };
   
   const handleDismissNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    // In the dropdown, dismissing usually means marking as read or removing from this short list
+    // For simplicity here, we'll just mark as read. A full implementation might remove it or call an API.
+    setNotifications(prev => prev.map(n => n.id === id ? {...n, read: true} : n ));
+    // If you want to remove from dropdown view:
+    // setNotifications(prev => prev.filter(n => n.id !== id)); 
   };
 
   return (
@@ -68,9 +72,9 @@ export function NotificationDropdown() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <ScrollArea className="max-h-80">
+        <ScrollArea className="max-h-80"> {/* Display up to 7 most recent or a fixed height */}
           {notifications.length > 0 ? (
-            notifications.slice(0, 7).map((notification) => ( // Display up to 7 most recent
+            notifications.slice(0, 7).map((notification) => ( 
               <NotificationItem key={notification.id} notification={notification} onDismiss={handleDismissNotification} />
             ))
           ) : (
