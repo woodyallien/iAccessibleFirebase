@@ -18,6 +18,7 @@ import {
 import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility } from "lucide-react";
 import { Logo } from "./logo";
 import { CreditBalanceDisplay } from "@/components/credit-balance-display";
+import { NotificationDropdown } from "@/components/notifications/notification-dropdown"; // Added import
 
 export function Header() {
   const placeholderCredits = 20; // Example initial credits
@@ -32,7 +33,7 @@ export function Header() {
           </div>
         </div>
 
-        <div className="flex items-center gap-x-3">
+        <div className="flex items-center gap-x-2 sm:gap-x-3"> {/* Adjusted gap for responsiveness */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -66,6 +67,7 @@ export function Header() {
           </DropdownMenu>
 
           <CreditBalanceDisplay credits={placeholderCredits} /> 
+          <NotificationDropdown /> {/* Added NotificationDropdown */}
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
