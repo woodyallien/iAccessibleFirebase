@@ -18,6 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCap
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { Download, PlusCircle, Settings2, Trash2, CalendarIcon, Info, BarChart3, ListChecks, FileSpreadsheet, FileCode2, FileTextIcon as ReportFileIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Added Tooltip imports
 
 // Placeholder data
 const userScannedDomains = [
@@ -50,6 +51,13 @@ export default function NewReportConfigurationUI() {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
 
+  useEffect(() => {
+    // Client-side effect for setting generatedAt if needed, or other client-specific logic
+    if (reportGenerated && !generatedAt) {
+      setGeneratedAt(new Date());
+    }
+  }, [reportGenerated, generatedAt]);
+
   const handleDomainToggle = (domainName: string) => {
     setSelectedDomains(prev => 
       prev.includes(domainName) ? prev.filter(d => d !== domainName) : [...prev, domainName]
@@ -65,13 +73,12 @@ export default function NewReportConfigurationUI() {
   const handleGenerateReport = () => {
     setGeneratingReport(true);
     setReportGenerated(false);
-    setGeneratedAt(null);
+    setGeneratedAt(null); 
     // Simulate API call
     setTimeout(() => {
       setGeneratingReport(false);
       setReportGenerated(true);
-      setGeneratedAt(new Date());
-      // In a real app, you'd fetch and display report data here
+      // setGeneratedAt(new Date()); // Managed by useEffect now to avoid hydration issues if rendered server-side
     }, 1500);
   };
 
@@ -203,7 +210,17 @@ export default function NewReportConfigurationUI() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="content-grouping" className="text-base font-medium">Content Grouping (URL Path Contains)</Label>
+                <div className="flex items-center space-x-1 mb-1">
+                  <Label htmlFor="content-grouping" className="text-base font-medium">Content Grouping (URL Path Contains)</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs text-sm">
+                      <p>e.g., Entering '/blog/' will include pages where the URL path contains '/blog/'.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input 
                   id="content-grouping" 
                   value={contentGrouping}
@@ -266,9 +283,11 @@ export default function NewReportConfigurationUI() {
         <div className="lg:col-span-1 space-y-6">
           <Card className="shadow-md sticky top-24">
             <CardHeader>
-              <CardTitle>Generated Report</CardTitle>
+              <CardTitle>
+                {reportGenerated ? (reportName || "Untitled Custom Report") : "Generated Report"}
+              </CardTitle>
               <CardDescription>
-                {reportGenerated ? `Custom Report: ${reportName || "Untitled Report"}` : "Your report will appear here once generated."}
+                {reportGenerated ? `Generated for your selected criteria.` : "Your report will appear here once generated."}
               </CardDescription>
               {reportGenerated && generatedAt && (
                  <p className="text-xs text-muted-foreground pt-1">
@@ -276,7 +295,7 @@ export default function NewReportConfigurationUI() {
                  </p>
               )}
             </CardHeader>
-            <CardContent className="min-h-[400px]"> {/* Added min-height for better placeholder visibility */}
+            <CardContent className="min-h-[400px]">
               {generatingReport && (
                  <div className="flex items-center justify-center py-10 text-muted-foreground">
                   <div role="status" aria-live="polite">
@@ -298,11 +317,11 @@ export default function NewReportConfigurationUI() {
               )}
               {reportGenerated && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
                     <h3 className="text-xl font-semibold text-primary">
                       Report Details
                     </h3>
-                     <div className="flex gap-2">
+                     <div className="flex gap-2 flex-wrap">
                         <Button variant="outline" size="sm"><FileSpreadsheet className="mr-2 h-4 w-4" />Export CSV</Button>
                         <Button variant="outline" size="sm"><ReportFileIcon className="mr-2 h-4 w-4" />Export PDF</Button>
                         <Button variant="outline" size="sm"><FileCode2 className="mr-2 h-4 w-4" />View HTML</Button>
@@ -314,7 +333,8 @@ export default function NewReportConfigurationUI() {
                     <h4 className="text-lg font-medium mb-2 flex items-center gap-2"><Info className="h-5 w-5 text-accent-foreground"/>Summary</h4>
                     <p className="text-sm text-muted-foreground">
                       This report covers scans for {selectedDomains.join(', ') || 'all selected domains'} 
-                      between {dateRange?.from ? format(dateRange.from, "PP") : 'N/A'} and {dateRange?.to ? format(dateRange.to, "PP") : 'N/A'}.
+                      {dateRange?.from ? ` between ${format(dateRange.from, "PP")}` : ''} 
+                      {dateRange?.to ? ` and ${format(dateRange.to, "PP")}` : (dateRange?.from ? '' : ' (no date range selected)')}.
                       It includes data for {selectedScanTypes.join(', ') || 'all scan types'}.
                       Based on the '{reportTemplate}' template.
                       Further summary details and key findings would appear here.
@@ -327,9 +347,6 @@ export default function NewReportConfigurationUI() {
                      <h4 className="text-lg font-medium mb-2 flex items-center gap-2"><BarChart3 className="h-5 w-5 text-accent-foreground"/>Visualizations</h4>
                      <div className="p-4 border rounded-md bg-muted/50 min-h-[200px] flex items-center justify-center">
                         <p className="text-muted-foreground italic">Chart placeholders - e.g., Issue Severity Breakdown, Trends.</p>
-                        {/* Example for a placeholder image: 
-                        <Image src="https://placehold.co/400x200.png" data-ai-hint="chart graph" alt="Placeholder chart" width={400} height={200} className="rounded-md" />
-                        */}
                      </div>
                   </div>
 
@@ -348,22 +365,11 @@ export default function NewReportConfigurationUI() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {/* In a real app, map over actual issue data here */}
                         <TableRow>
                           <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                             Issue details would be listed here. (Placeholder)
                           </TableCell>
                         </TableRow>
-                        {/* Example Row:
-                        <TableRow>
-                          <TableCell className="font-medium">Missing Alt Text</TableCell>
-                          <TableCell>Critical</TableCell>
-                          <TableCell>/products/item-123</TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="ghost" size="sm">Details</Button>
-                          </TableCell>
-                        </TableRow>
-                        */}
                       </TableBody>
                     </Table>
                   </div>
@@ -377,3 +383,5 @@ export default function NewReportConfigurationUI() {
   );
 }
 
+
+    
