@@ -16,7 +16,8 @@ import {
   Coins, 
   History,
   ListChecks,
-  TrendingUp
+  TrendingUp,
+  ScrollText // Added ScrollText import
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
