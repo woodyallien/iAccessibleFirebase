@@ -8,7 +8,7 @@ export function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   return (
     <Link href="/" className="flex items-center gap-2" aria-label="iAccessible Home">
       <MountainSnow className={`${iconSize} text-primary`} aria-hidden="true" />
-      <span className={`font-semibold ${textSize} text-foreground`}>
+      <span className={`font-semibold ${textSize} text-foreground group-data-[collapsible=icon]:hidden`}>
         {/* Using a more descriptive name as per guidelines */}
         iAccessible
       </span>
