@@ -1,9 +1,10 @@
+
 "use client"
 
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { ChevronLeft, ChevronRight, PanelLeft } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -289,27 +290,39 @@ const SidebarRail = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button">
 >(({ className, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, open } = useSidebar()
+  // Assuming side="left" as predominantly used in AppLayout for icon direction
+  const Icon = open ? ChevronLeft : ChevronRight;
 
   return (
     <button
       ref={ref}
       data-sidebar="rail"
       aria-label="Toggle Sidebar"
-      tabIndex={-1}
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
-        "[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize",
-        "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
-        "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar",
-        "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
-        "[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
+        "absolute inset-y-0 z-20 my-auto hidden items-center justify-center sm:flex", // base positioning & visibility
+        "bg-muted hover:bg-accent text-muted-foreground hover:text-accent-foreground shadow-md", // appearance
+        "w-6 h-12 rounded-lg", // shape
+        "cursor-pointer", // interaction
+
+        // Positioning for expanded sidebar or icon-only sidebar
+        "group-data-[state=expanded]:group-data-[side=left]:right-0 group-data-[state=expanded]:group-data-[side=left]:translate-x-1/2",
+        "group-data-[state=expanded]:group-data-[side=right]:left-0 group-data-[state=expanded]:group-data-[side=right]:-translate-x-1/2",
+        "group-data-[collapsible=icon]:group-data-[side=left]:right-0 group-data-[collapsible=icon]:group-data-[side=left]:translate-x-1/2",
+        "group-data-[collapsible=icon]:group-data-[side=right]:left-0 group-data-[collapsible=icon]:group-data-[side=right]:-translate-x-1/2",
+
+        // Positioning for offcanvas collapsed sidebar (relative to viewport edge)
+        "group-data-[collapsible=offcanvas]:group-data-[side=left]:left-0 group-data-[collapsible=offcanvas]:group-data-[side=left]:translate-x-1/2",
+        "group-data-[collapsible=offcanvas]:group-data-[side=right]:right-0 group-data-[collapsible=offcanvas]:group-data-[side=right]:-translate-x-1/2",
+        
         className
       )}
       {...props}
-    />
+    >
+      <Icon className="h-5 w-5" />
+    </button>
   )
 })
 SidebarRail.displayName = "SidebarRail"
@@ -761,3 +774,4 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
