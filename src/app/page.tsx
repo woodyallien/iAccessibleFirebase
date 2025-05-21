@@ -1,7 +1,9 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, CheckCircle, AlertTriangle } from "lucide-react";
+import { ArrowUpRight, CheckCircle, AlertTriangle, ScanLine, FileScan, Settings, FileText } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function DashboardPage() {
   return (
@@ -57,18 +59,33 @@ export default function DashboardPage() {
             Explore the tools and resources to make your digital products inclusive for everyone.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+        <CardContent className="grid gap-4 md:grid-cols-2 items-start">
           <div>
-            <h3 className="text-lg font-semibold mb-2">Getting Started</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Navigate through the sidebar to access different features of the application.
-              Start with an 'Accessibility Check' or review your 'Settings'.
-            </p>
-            <Button variant="default">
-              Start New Check <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Button>
+            <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
+            <div className="space-y-3">
+              <Link href="/accessibility-check" passHref>
+                <Button variant="default" className="w-full sm:w-auto justify-start text-left">
+                  <ScanLine className="mr-2 h-4 w-4" /> Scan a Web Page
+                </Button>
+              </Link>
+              <Link href="/pdf-scan" passHref>
+                <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
+                  <FileScan className="mr-2 h-4 w-4" /> Scan a PDF Document
+                </Button>
+              </Link>
+               <Link href="/reports" passHref>
+                <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
+                  <FileText className="mr-2 h-4 w-4" /> View Reports
+                </Button>
+              </Link>
+              <Link href="/settings" passHref>
+                <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
+                  <Settings className="mr-2 h-4 w-4" /> Manage Settings
+                </Button>
+              </Link>
+            </div>
           </div>
-          <div className="relative aspect-video rounded-md overflow-hidden">
+          <div className="relative aspect-video rounded-md overflow-hidden mt-4 md:mt-0">
             <Image 
               src="https://placehold.co/600x338.png" 
               alt="Placeholder image illustrating accessibility concepts"

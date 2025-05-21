@@ -1,5 +1,6 @@
+
 import type { NavItem } from "@/types";
-import { LayoutDashboard, Settings, Accessibility, FileText } from "lucide-react"; // Added FileText
+import { LayoutDashboard, Settings, Accessibility, FileText, FileScan } from "lucide-react"; // Added FileText, FileScan
 
 export type SiteConfig = {
   name: string;
@@ -25,10 +26,16 @@ export const siteConfig: SiteConfig = {
       title: "Accessibility Check",
       href: "/accessibility-check",
       icon: Accessibility,
-      description: "Tools and resources for accessibility.",
+      description: "Scan a web page for accessibility issues.",
     },
     {
-      title: "Reports", // New Reports Link
+      title: "PDF Scan",
+      href: "/pdf-scan",
+      icon: FileScan,
+      description: "Scan a PDF document for accessibility issues.",
+    },
+    {
+      title: "Reports",
       href: "/reports",
       icon: FileText,
       description: "View and generate accessibility reports.",
