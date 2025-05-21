@@ -72,7 +72,7 @@ export default function ReportsLandingPage() {
                 {/* Placeholder for no data. In a real app, map over saved reports here. */}
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground py-10">
-                    You have not generated or saved any reports yet.
+                    No saved or recent reports. Build a custom report to get started!
                   </TableCell>
                 </TableRow>
                 {/* Example Row (commented out):
