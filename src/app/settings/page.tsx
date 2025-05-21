@@ -17,12 +17,12 @@ import {
   History,
   ListChecks,
   TrendingUp,
-  ScrollText // Added ScrollText import
+  ScrollText
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"; // Import the new modal
-import React, { useState } from 'react';
+import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
+import React, { useState, useEffect } from 'react';
 
 
 export default function SettingsPage() {
@@ -30,7 +30,14 @@ export default function SettingsPage() {
   const userSubscriptionTierName = "Pro Plan";
   const monthlyAllowanceAmount = 1000;
   const userCreditBalance = 5; // Example, could be dynamic
-  const nextResetDate = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toLocaleDateString();
+  
+  const [nextResetDate, setNextResetDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    const date = new Date();
+    setNextResetDate(new Date(date.getFullYear(), date.getMonth() + 1, 1).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
+  }, []);
+
   const isSubscriptionHasAllowance = true;
   const isSubscriptionHasResetDate = true;
   const isTopUpFeatureEnabled = true;
@@ -123,7 +130,7 @@ export default function SettingsPage() {
               {isSubscriptionHasResetDate && (
                 <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
                   <span className="font-medium text-muted-foreground flex items-center gap-1.5"><History className="h-4 w-4" />Credits Reset On:</span>
-                  <span>{nextResetDate}</span>
+                  <span>{nextResetDate || 'Loading...'}</span>
                 </li>
               )}
             </ul>

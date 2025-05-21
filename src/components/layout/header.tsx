@@ -15,11 +15,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, UserCircle } from "lucide-react";
 import { Logo } from "./logo";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { CreditBalanceDisplay } from "@/components/credit-balance-display"; // Added import
+// import { useIsMobile } from "@/hooks/use-mobile"; // No longer needed for logo visibility logic here
+import { CreditBalanceDisplay } from "@/components/credit-balance-display";
 
 export function Header() {
-  const isMobile = useIsMobile();
+  // const isMobile = useIsMobile(); // We will rely on CSS for the logo's responsive visibility
   // Placeholder credit balance - in a real app, this would come from state/context/API
   const placeholderCredits = 5; 
 
@@ -28,7 +28,11 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="md:hidden" aria-label="Open navigation menu"/>
-          {!isMobile && <div className="hidden md:block"><Logo size="sm" /></div>}
+          {/* The div below uses `hidden md:block` for responsive visibility controlled by CSS,
+              which avoids hydration issues with JS-based conditional rendering. */}
+          <div className="hidden md:block">
+            <Logo size="sm" />
+          </div>
         </div>
 
         <div className="flex items-center gap-x-3">
@@ -64,3 +68,4 @@ export function Header() {
   );
 }
 Header.displayName = "Header";
+
