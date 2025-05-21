@@ -6,6 +6,7 @@ import {
   Sidebar,
   SidebarInset,
   SidebarContent,
+  SidebarRail, // Added import for SidebarRail
 } from "@/components/ui/sidebar";
 import { Header } from "./header";
 import { SidebarNav } from "./sidebar-nav";
@@ -22,6 +23,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <SidebarContent>
           <SidebarNav />
         </SidebarContent>
+        <SidebarRail /> {/* Added SidebarRail component */}
       </Sidebar>
       <SidebarInset className="flex flex-col">
         <Header />
