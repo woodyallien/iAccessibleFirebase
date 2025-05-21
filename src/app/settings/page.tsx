@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch"; // Added Switch import
 import { 
   Fingerprint, 
   Palette, 
@@ -17,37 +18,36 @@ import {
   History,
   ListChecks,
   TrendingUp,
-  ScrollText
+  ScrollText,
+  UserCircle, // Added UserCircle
+  Mail, // Added Mail
+  Lock // Added Lock
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
 import React, { useState, useEffect } from 'react';
-import { useCredits } from "@/contexts/credit-context"; // Added import
+import { useCredits } from "@/contexts/credit-context"; 
 
 
 export default function SettingsPage() {
-  const { creditBalance } = useCredits(); // Use credits from context
+  const { creditBalance } = useCredits(); 
 
-  // Placeholder data - in a real app, this would come from user data/API
-  const userSubscriptionTierName = "Pro Plan"; // Example
-  const monthlyAllowanceAmount = 1000; // Example
+  const userSubscriptionTierName = "Pro Plan"; 
+  const monthlyAllowanceAmount = 1000; 
   
   const [nextResetDate, setNextResetDate] = useState<string | null>(null);
 
   useEffect(() => {
-    // Calculate next reset date on client-side to avoid hydration mismatch
     const date = new Date();
     setNextResetDate(new Date(date.getFullYear(), date.getMonth() + 1, 1).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
   }, []);
 
-  // These would typically come from user subscription status or feature flags
   const isSubscriptionHasAllowance = true;
   const isSubscriptionHasResetDate = true;
   const isTopUpFeatureEnabled = true;
   const isUserNotOnHighestTier = true;
 
-  // Modal state for demonstration purposes (if this page were to trigger credit actions)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState<() => void>(() => {});
   const [modalCreditsRequired, setModalCreditsRequired] = useState(0);
@@ -173,10 +173,32 @@ export default function SettingsPage() {
             <Bell className="h-6 w-6 text-primary" aria-hidden="true"/>
             Notifications (Coming Soon)
           </CardTitle>
-          <CardDescription>Manage your notification preferences. This feature is under development.</CardDescription>
+          <CardDescription>Manage your notification preferences. This feature is under development but will allow you to control in-app and email alerts.</CardDescription>
         </CardHeader>
-        <CardContent>
-            <p className="text-sm text-muted-foreground">Notification settings will appear here.</p>
+        <CardContent className="space-y-4">
+            <div className="space-y-2 p-4 border rounded-lg shadow-sm">
+                <h4 className="font-medium text-foreground">In-App Notifications</h4>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="inapp-scan-complete" className="text-muted-foreground">Scan Completions</Label>
+                    <Switch id="inapp-scan-complete" disabled checked={true} aria-label="Toggle in-app notifications for scan completions (disabled)"/>
+                </div>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="inapp-credit-warnings" className="text-muted-foreground">Credit Warnings</Label>
+                    <Switch id="inapp-credit-warnings" disabled checked={true} aria-label="Toggle in-app notifications for credit warnings (disabled)"/>
+                </div>
+            </div>
+             <div className="space-y-2 p-4 border rounded-lg shadow-sm">
+                <h4 className="font-medium text-foreground">Email Notifications</h4>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="email-weekly-digest" className="text-muted-foreground">Weekly Digest</Label>
+                    <Switch id="email-weekly-digest" disabled aria-label="Toggle email notifications for weekly digest (disabled)"/>
+                </div>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="email-security-alerts" className="text-muted-foreground">Security Alerts</Label>
+                    <Switch id="email-security-alerts" disabled checked={true} aria-label="Toggle email notifications for security alerts (disabled)"/>
+                </div>
+            </div>
+            <p className="text-sm text-muted-foreground">More granular notification controls are planned for a future update.</p>
         </CardContent>
       </Card>
       
@@ -186,10 +208,34 @@ export default function SettingsPage() {
             <Fingerprint className="h-6 w-6 text-primary" aria-hidden="true"/>
             Account (Coming Soon)
           </CardTitle>
-          <CardDescription>Manage your account details. This feature is under development.</CardDescription>
+          <CardDescription>Manage your account details. This feature is under development but will include profile and security options.</CardDescription>
         </CardHeader>
-        <CardContent>
-            <p className="text-sm text-muted-foreground">Account management options will appear here.</p>
+        <CardContent className="space-y-6">
+            <div className="space-y-2 p-4 border rounded-lg shadow-sm">
+                <div className="space-y-1">
+                    <Label htmlFor="account-name" className="text-base font-medium">Full Name</Label>
+                    <div className="flex items-center gap-2">
+                        <UserCircle className="h-5 w-5 text-muted-foreground" />
+                        <Input id="account-name" placeholder="Your Name" disabled value="Jane Doe (Placeholder)" />
+                    </div>
+                </div>
+                 <div className="space-y-1">
+                    <Label htmlFor="account-email" className="text-base font-medium">Email Address</Label>
+                     <div className="flex items-center gap-2">
+                        <Mail className="h-5 w-5 text-muted-foreground" />
+                        <Input id="account-email" type="email" placeholder="your@email.com" disabled value="jane.doe@example.com (Placeholder)" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Email address cannot be changed via this interface.</p>
+                </div>
+            </div>
+            <div className="space-y-2 p-4 border rounded-lg shadow-sm">
+                <h4 className="font-medium text-foreground">Security</h4>
+                 <div className="flex items-center gap-2">
+                    <Lock className="h-5 w-5 text-muted-foreground" />
+                    <Button variant="outline" disabled>Change Password</Button>
+                </div>
+            </div>
+            <p className="text-sm text-muted-foreground">Options for profile updates and security settings will be available here in a future update.</p>
         </CardContent>
       </Card>
 
@@ -219,3 +265,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+
