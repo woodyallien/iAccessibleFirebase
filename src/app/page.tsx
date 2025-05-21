@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, CheckCircle, AlertTriangle, ScanLine, FileScan, Settings, FileText } from "lucide-react";
+import { ArrowUpRight, CheckCircle, AlertTriangle, ScanLine, FileScan, Settings, FileText, Award } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,8 +13,8 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Accessibility Score</CardTitle>
-            <CheckCircle className="h-5 w-5 text-green-500" aria-hidden="true" />
+            <CardTitle className="text-sm font-medium">Overall Site Quality</CardTitle>
+            <Award className="h-5 w-5 text-green-500" aria-hidden="true" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">92%</div>
