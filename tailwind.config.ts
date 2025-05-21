@@ -11,6 +11,7 @@ export default {
   	extend: {
       fontFamily: {
         sans: ["var(--font-plus-jakarta-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-plus-jakarta-sans)", "Georgia", "serif"], // Added Plus Jakarta Sans for serif
         mono: ["var(--font-jetbrains-mono)", "monospace"],
       },
   		colors: {
@@ -45,7 +46,7 @@ export default {
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
   			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
+  			input: 'hsl(var(--input))', // ShadCN uses --input for border color of inputs, was #f4f5f7, now matches general border
   			ring: 'hsl(var(--ring))',
   			chart: {
   				'1': 'hsl(var(--chart-1))',
