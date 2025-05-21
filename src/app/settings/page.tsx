@@ -23,47 +23,39 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCap
 import { Badge } from "@/components/ui/badge";
 import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
 import React, { useState, useEffect } from 'react';
+import { useCredits } from "@/contexts/credit-context"; // Added import
 
 
 export default function SettingsPage() {
+  const { creditBalance } = useCredits(); // Use credits from context
+
   // Placeholder data - in a real app, this would come from user data/API
-  const userSubscriptionTierName = "Pro Plan";
-  const monthlyAllowanceAmount = 1000;
-  const userCreditBalance = 5; // Example, could be dynamic
+  const userSubscriptionTierName = "Pro Plan"; // Example
+  const monthlyAllowanceAmount = 1000; // Example
   
   const [nextResetDate, setNextResetDate] = useState<string | null>(null);
 
   useEffect(() => {
+    // Calculate next reset date on client-side to avoid hydration mismatch
     const date = new Date();
     setNextResetDate(new Date(date.getFullYear(), date.getMonth() + 1, 1).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
   }, []);
 
+  // These would typically come from user subscription status or feature flags
   const isSubscriptionHasAllowance = true;
   const isSubscriptionHasResetDate = true;
   const isTopUpFeatureEnabled = true;
   const isUserNotOnHighestTier = true;
 
+  // Modal state for demonstration purposes (if this page were to trigger credit actions)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState<() => void>(() => {});
   const [modalCreditsRequired, setModalCreditsRequired] = useState(0);
-
-  // Example action that would trigger the modal
-  const handleExampleScanAction = () => {
-    const creditsRequired = 10; // Example
-    setModalCreditsRequired(creditsRequired);
-    setModalAction(() => () => {
-      console.log("Scan action confirmed and processed!");
-      // Deduct credits, perform scan, etc.
-    });
-    setIsModalOpen(true);
-  };
-
 
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight text-foreground">Settings</h1>
 
-      {/* Appearance Card */}
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -95,7 +87,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Credits & Subscription Card */}
       <Card className="shadow-lg" id="credits-subscription">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -125,12 +116,12 @@ export default function SettingsPage() {
               )}
               <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
                 <span className="font-medium text-muted-foreground flex items-center gap-1.5"><Coins className="h-4 w-4" />Remaining Credits:</span>
-                <span className="font-semibold text-lg text-primary">{userCreditBalance.toLocaleString()}</span>
+                <span className="font-semibold text-lg text-primary">{creditBalance.toLocaleString()}</span>
               </li>
-              {isSubscriptionHasResetDate && (
+              {isSubscriptionHasResetDate && nextResetDate && (
                 <li className="flex justify-between items-center p-2 rounded-md hover:bg-muted/50">
                   <span className="font-medium text-muted-foreground flex items-center gap-1.5"><History className="h-4 w-4" />Credits Reset On:</span>
-                  <span>{nextResetDate || 'Loading...'}</span>
+                  <span>{nextResetDate}</span>
                 </li>
               )}
             </ul>
@@ -149,12 +140,6 @@ export default function SettingsPage() {
             )}
           </div>
           
-          {/* Example button to trigger the credit confirmation modal */}
-          {/* <Button variant="destructive" onClick={handleExampleScanAction} className="mt-4">
-            Test Scan Action (10 Credits)
-          </Button> */}
-
-
           <div>
             <h3 className="text-lg font-semibold mb-3 mt-6 flex items-center gap-2">
                 <ScrollText className="h-5 w-5 text-muted-foreground" />
@@ -170,20 +155,11 @@ export default function SettingsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {/* Placeholder for no data. In a real app, map over usage data here. */}
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground py-10">
-                    No credit usage history found.
+                    No credit usage history found. (This is a placeholder)
                   </TableCell>
                 </TableRow>
-                {/* Example Row (commented out):
-                <TableRow>
-                  <TableCell>2024-07-28</TableCell>
-                  <TableCell>Website Scan: example.com</TableCell>
-                  <TableCell className="text-right">-10</TableCell>
-                  <TableCell className="text-right">990</TableCell>
-                </TableRow>
-                */}
               </TableBody>
               <TableCaption>A summary of your recent credit transactions.</TableCaption>
             </Table>
@@ -191,7 +167,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       
-      {/* Notifications Card */}
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -205,7 +180,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       
-      {/* Account Card */}
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -223,23 +197,20 @@ export default function SettingsPage() {
         <Button variant="default" disabled>Save Changes (Disabled)</Button>
       </div>
 
-      {/* Credit Confirmation Modal Instance */}
       <CreditConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={modalAction}
         creditsRequired={modalCreditsRequired}
-        currentCredits={userCreditBalance}
+        currentCredits={creditBalance}
         onTopUp={() => {
           setIsModalOpen(false);
-          // In a real app, navigate to top-up section or open a top-up modal
           const topUpSection = document.getElementById('credits-subscription');
           if (topUpSection) topUpSection.scrollIntoView({ behavior: 'smooth' });
           console.log("Navigate to top-up credits");
         }}
         onUpgrade={() => {
           setIsModalOpen(false);
-          // In a real app, navigate to upgrade page or open an upgrade modal
            const topUpSection = document.getElementById('credits-subscription');
           if (topUpSection) topUpSection.scrollIntoView({ behavior: 'smooth' });
           console.log("Navigate to upgrade subscription");
@@ -248,4 +219,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

@@ -11,10 +11,13 @@ import Image from "next/image";
 import React, { useState } from 'react';
 import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useCredits } from "@/contexts/credit-context"; // Added import
+
+// Placeholder for credit cost. In a real app, this would be fetched from config or backend.
+const WEB_PAGE_SCAN_COST = 10;
 
 export default function AdHocWebScanPage() {
-  const currentUserCredits = 20; 
-  const scanCreditsRequired = 10; // Credits for web page scan
+  const { creditBalance, deductCredits } = useCredits(); // Use credits from context
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [urlToScan, setUrlToScan] = useState("");
@@ -35,21 +38,20 @@ export default function AdHocWebScanPage() {
     setIsModalOpen(false);
     setIsScanning(true);
     setScanResult(null);
-    console.log(`Scanning URL: ${urlToScan}. This would deduct ${scanCreditsRequired} credits.`);
+    
+    // Actual credit deduction
+    deductCredits(WEB_PAGE_SCAN_COST);
+    console.log(`Scanning URL: ${urlToScan}. Deducted ${WEB_PAGE_SCAN_COST} credits.`);
     
     // Simulate API call for scanning
     setTimeout(() => {
       setIsScanning(false);
-      // Simulate a result
       setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Full report details would appear here.`);
-      // In a real app, you'd deduct credits here or in the backend
-      // setcurrentUserCredits(prev => prev - scanCreditsRequired)
     }, 2000);
   };
 
   const handleSaveReport = () => {
     console.log("Saving report for:", urlToScan, scanResult);
-    // In a real app, this would save the report to user's history/database
     alert("Report saved (simulation)!");
   };
 
@@ -74,7 +76,8 @@ export default function AdHocWebScanPage() {
             New Web Page Scan
           </CardTitle>
           <CardDescription>
-            Enter a URL to perform an on-demand accessibility check. This scan will use {scanCreditsRequired} credit(s).
+            Enter a URL to perform an on-demand accessibility check. This scan will use {WEB_PAGE_SCAN_COST} credit(s).
+            You currently have {creditBalance} credit(s).
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -149,7 +152,6 @@ export default function AdHocWebScanPage() {
               <Button onClick={handleSaveReport} variant="outline">
                 <Save className="mr-2 h-4 w-4" /> Save Report to History
               </Button>
-              {/* Placeholder for export options */}
               <Button variant="outline" disabled>Export (Coming Soon)</Button>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -196,8 +198,8 @@ export default function AdHocWebScanPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={performActualScan}
-        creditsRequired={scanCreditsRequired}
-        currentCredits={currentUserCredits}
+        creditsRequired={WEB_PAGE_SCAN_COST}
+        currentCredits={creditBalance}
         onTopUp={handleTopUp}
         onUpgrade={handleUpgrade}
       />

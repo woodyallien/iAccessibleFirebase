@@ -19,21 +19,22 @@ import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility, Mor
 import { Logo } from "./logo";
 import { CreditBalanceDisplay } from "@/components/credit-balance-display";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
+import React from 'react';
 
 export function Header() {
-  const placeholderCredits = 20; // Example initial credits
+  // Credit balance is now managed by CreditContext, CreditBalanceDisplay handles fetching it.
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="md:hidden" aria-label="Open navigation menu"/>
-          <div className="hidden md:block">
+          <div className="hidden md:block"> {/* This div is kept for layout consistency */}
             <Logo size="sm" />
           </div>
         </div>
 
-        <div className="flex items-center gap-x-1 sm:gap-x-2"> {/* Adjusted gap for responsiveness */}
+        <div className="flex items-center gap-x-1 sm:gap-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -66,7 +67,7 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <CreditBalanceDisplay credits={placeholderCredits} /> 
+          <CreditBalanceDisplay /> 
           <NotificationDropdown />
 
           <DropdownMenu>

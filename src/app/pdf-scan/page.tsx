@@ -9,10 +9,13 @@ import { FileScan, Zap, Save, FileTextIcon, Info, AlertTriangle } from "lucide-r
 import React, { useState, ChangeEvent } from 'react';
 import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useCredits } from "@/contexts/credit-context"; // Added import
+
+// Placeholder for credit cost. In a real app, this would be fetched from config or backend.
+const PDF_SCAN_COST = 5;
 
 export default function AdHocPdfScanPage() {
-  const currentUserCredits = 20; 
-  const pdfScanCreditsRequired = 5; // Credits for PDF scan
+  const { creditBalance, deductCredits } = useCredits(); // Use credits from context
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -55,14 +58,15 @@ export default function AdHocPdfScanPage() {
     setIsModalOpen(false);
     setIsScanning(true);
     setScanResult(null);
-    console.log(`Scanning PDF: ${selectedFile?.name}. This would deduct ${pdfScanCreditsRequired} credits.`);
+
+    // Actual credit deduction
+    deductCredits(PDF_SCAN_COST);
+    console.log(`Scanning PDF: ${selectedFile?.name}. Deducted ${PDF_SCAN_COST} credits.`);
     
     // Simulate API call for scanning
     setTimeout(() => {
       setIsScanning(false);
-      // Simulate a result
       setScanResult(`Scan for PDF "${selectedFile?.name}" completed. Issues found: 2 Critical, 5 Warnings. Full report details would appear here.`);
-      // In a real app, you'd deduct credits here
     }, 2500);
   };
 
@@ -92,7 +96,8 @@ export default function AdHocPdfScanPage() {
             New PDF Scan
           </CardTitle>
           <CardDescription>
-            Upload a PDF document to perform an on-demand accessibility check. This scan will use {pdfScanCreditsRequired} credit(s). Max file size: 10MB.
+            Upload a PDF document to perform an on-demand accessibility check. This scan will use {PDF_SCAN_COST} credit(s). Max file size: 10MB.
+            You currently have {creditBalance} credit(s).
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -175,12 +180,11 @@ export default function AdHocPdfScanPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={performActualScan}
-        creditsRequired={pdfScanCreditsRequired}
-        currentCredits={currentUserCredits}
+        creditsRequired={PDF_SCAN_COST}
+        currentCredits={creditBalance}
         onTopUp={handleTopUp}
         onUpgrade={handleUpgrade}
       />
     </div>
   );
 }
-

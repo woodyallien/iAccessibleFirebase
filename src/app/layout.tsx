@@ -1,20 +1,22 @@
+
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AppLayout } from '@/components/layout/app-layout';
 import { siteConfig } from '@/config/site';
+import { CreditProvider } from '@/contexts/credit-context'; // Added import
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: '--font-plus-jakarta-sans',
   subsets: ['latin'],
-  display: 'swap', // Added display swap for better font loading
+  display: 'swap', 
 });
 
 const jetBrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
   subsets: ['latin'],
-  display: 'swap', // Added display swap for better font loading
+  display: 'swap', 
 });
 
 export const metadata: Metadata = {
@@ -47,14 +49,14 @@ export const metadata: Metadata = {
   //   title: siteConfig.name,
   //   description: siteConfig.description,
   //   images: [siteConfig.ogImage],
-  //   creator: "@yourtwitterhandle", // Replace with your Twitter handle
+  //   creator: "@yourtwitterhandle", 
   // },
   // icons: {
-  //   icon: "/favicon.ico", // Replace with your favicon path
-  //   shortcut: "/favicon-16x16.png", // Replace
-  //   apple: "/apple-touch-icon.png", // Replace
+  //   icon: "/favicon.ico", 
+  //   shortcut: "/favicon-16x16.png", 
+  //   apple: "/apple-touch-icon.png", 
   // },
-  // manifest: `${siteConfig.url}/site.webmanifest`, // Replace
+  // manifest: `${siteConfig.url}/site.webmanifest`, 
 };
 
 export default function RootLayout({
@@ -71,9 +73,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AppLayout>
-            {children}
-          </AppLayout>
+          <CreditProvider> {/* Added CreditProvider wrapper */}
+            <AppLayout>
+              {children}
+            </AppLayout>
+          </CreditProvider>
         </ThemeProvider>
       </body>
     </html>
