@@ -1,18 +1,20 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AppLayout } from '@/components/layout/app-layout';
 import { siteConfig } from '@/config/site';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-plus-jakarta-sans',
   subsets: ['latin'],
+  display: 'swap', // Added display swap for better font loading
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const jetBrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
   subsets: ['latin'],
+  display: 'swap', // Added display swap for better font loading
 });
 
 export const metadata: Metadata = {
@@ -21,7 +23,6 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  // Add more metadata tags as needed for SEO and accessibility
   keywords: ["accessibility", "MVP", "Next.js", "React", "Tailwind CSS"],
   authors: [{ name: "Your Name/Company", url: siteConfig.url }],
   creator: "Your Name/Company",
@@ -63,7 +64,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background font-sans text-foreground`}>
+      <body className={`${plusJakartaSans.variable} ${jetBrainsMono.variable} antialiased min-h-screen bg-background font-sans text-foreground`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
