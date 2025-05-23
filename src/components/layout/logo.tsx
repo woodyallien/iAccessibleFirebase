@@ -1,4 +1,3 @@
-import { MountainSnow } from "lucide-react";
 import Link from "next/link";
 
 export function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
@@ -7,9 +6,19 @@ export function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 
   return (
     <Link href="/" className="flex items-center gap-2" aria-label="iAccessible Home">
-      <MountainSnow className={`${iconSize} text-primary`} aria-hidden="true" />
+      <svg
+        className={`${iconSize} text-primary`}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        {/* Dot of the 'i' */}
+        <circle cx="12" cy="6.5" r="2.5" fill="currentColor" />
+        {/* Stem of the 'i' */}
+        <rect x="10.5" y="11" width="3" height="7" rx="1.5" fill="currentColor" />
+      </svg>
       <span className={`font-semibold ${textSize} text-foreground group-data-[collapsible=icon]:hidden`}>
-        {/* Using a more descriptive name as per guidelines */}
         iAccessible
       </span>
     </Link>
