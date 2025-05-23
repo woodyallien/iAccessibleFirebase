@@ -1,6 +1,6 @@
 
 import type { NavItem } from "@/types";
-import { LayoutDashboard, Settings, Accessibility, FileText, FileScan } from "lucide-react"; // Added FileText, FileScan
+import { LayoutDashboard, Settings, Accessibility, FileText, FileScan, ScanSearch } from "lucide-react"; // Added ScanSearch
 
 export type SiteConfig = {
   name: string;
@@ -23,11 +23,17 @@ export const siteConfig: SiteConfig = {
       description: "Overview of your accessible application.",
     },
     {
-      title: "Accessibility Check",
-      href: "/accessibility-check",
-      icon: Accessibility,
-      description: "Scan a web page for accessibility issues.",
+      title: "Ad Hoc Scans", // Renamed for clarity
+      href: "/accessibility-check", // Existing single page scan
+      icon: Accessibility, // Keep this for general web accessibility
+      description: "Perform single web page or PDF scans.",
     },
+    // { // Domain Scan might be a sub-section or a new top-level item post-MVP or if very distinct
+    //   title: "Domain Scans",
+    //   href: "/domain-scan", // Example path for a dedicated domain scan section
+    //   icon: ScanSearch,
+    //   description: "Manage and initiate full domain scans."
+    // },
     {
       title: "PDF Scan",
       href: "/pdf-scan",
@@ -48,3 +54,5 @@ export const siteConfig: SiteConfig = {
     },
   ],
 };
+
+    

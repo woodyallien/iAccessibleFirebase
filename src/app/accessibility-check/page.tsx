@@ -6,18 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ScanLine, Zap, Settings2, Save, FileTextIcon, Info } from "lucide-react";
+import { ScanLine, Zap, Settings2, Save, FileTextIcon, Info, ScanSearch } from "lucide-react"; // Added ScanSearch
 import Image from "next/image";
 import React, { useState } from 'react';
 import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useCredits } from "@/contexts/credit-context"; // Added import
+import { useCredits } from "@/contexts/credit-context"; 
+import Link from "next/link"; // Added Link
 
 // Placeholder for credit cost. In a real app, this would be fetched from config or backend.
 const WEB_PAGE_SCAN_COST = 10;
 
 export default function AdHocWebScanPage() {
-  const { creditBalance, deductCredits } = useCredits(); // Use credits from context
+  const { creditBalance, deductCredits } = useCredits(); 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [urlToScan, setUrlToScan] = useState("");
@@ -39,11 +40,9 @@ export default function AdHocWebScanPage() {
     setIsScanning(true);
     setScanResult(null);
     
-    // Actual credit deduction
     deductCredits(WEB_PAGE_SCAN_COST);
     console.log(`Scanning URL: ${urlToScan}. Deducted ${WEB_PAGE_SCAN_COST} credits.`);
     
-    // Simulate API call for scanning
     setTimeout(() => {
       setIsScanning(false);
       setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Full report details would appear here.`);
@@ -67,13 +66,20 @@ export default function AdHocWebScanPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">Scan a Single Web Page</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Ad Hoc Accessibility Scans</h1>
+        <Link href="/domain-scan/add" passHref>
+          <Button variant="outline">
+            <ScanSearch className="mr-2 h-4 w-4" /> Monitor & Scan Full Domains
+          </Button>
+        </Link>
+      </div>
       
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ScanLine className="h-6 w-6 text-primary" aria-hidden="true"/>
-            New Web Page Scan
+            Scan a Single Web Page
           </CardTitle>
           <CardDescription>
             Enter a URL to perform an on-demand accessibility check. This scan will use {WEB_PAGE_SCAN_COST} credit(s).
@@ -206,3 +212,5 @@ export default function AdHocWebScanPage() {
     </div>
   );
 }
+
+    
