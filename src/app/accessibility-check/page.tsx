@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ScanLine, Zap, Settings2, Save, FileTextIcon, Info, ScanSearch } from "lucide-react"; // Added ScanSearch
+import { Checkbox } from "@/components/ui/checkbox"; // Added Checkbox
+import { ScanLine, Zap, Settings2, Save, FileTextIcon, Info, ScanSearch } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from 'react';
 import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useCredits } from "@/contexts/credit-context"; 
-import Link from "next/link"; // Added Link
+import Link from "next/link";
 
 // Placeholder for credit cost. In a real app, this would be fetched from config or backend.
 const WEB_PAGE_SCAN_COST = 10;
@@ -26,12 +27,25 @@ export default function AdHocWebScanPage() {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // State for scan service checkboxes
+  const [scanServiceAccessibility, setScanServiceAccessibility] = useState(true);
+  const [scanServiceReadability, setScanServiceReadability] = useState(true);
+  const [scanServiceSEO, setScanServiceSEO] = useState(true);
+  const [scanServicePageHealth, setScanServicePageHealth] = useState(true);
+
   const handleScanAttempt = () => {
     setError(null);
     if (!urlToScan.trim() || !urlToScan.startsWith("http")) {
       setError("Please enter a valid URL starting with http:// or https://.");
       return;
     }
+    // Log selected services (for future use)
+    console.log("Selected services:", {
+      accessibility: scanServiceAccessibility,
+      readability: scanServiceReadability,
+      seo: scanServiceSEO,
+      pageHealth: scanServicePageHealth,
+    });
     setIsModalOpen(true);
   };
 
@@ -114,12 +128,79 @@ export default function AdHocWebScanPage() {
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="advanced-options">
               <AccordionTrigger>
-                <Settings2 className="mr-2 h-4 w-4" /> Advanced Options (Coming Soon)
+                <Settings2 className="mr-2 h-4 w-4" /> Select Scan Services & Options
               </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-sm text-muted-foreground p-4">
-                  Future options like specifying viewport size, user agent, or wait times before scanning will appear here.
-                </p>
+              <AccordionContent className="space-y-4 pt-4">
+                <p className="text-sm font-medium text-foreground mb-2">Choose services to include in this scan:</p>
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <Checkbox 
+                      id="scanServiceAccessibility" 
+                      checked={scanServiceAccessibility} 
+                      onCheckedChange={(checked) => setScanServiceAccessibility(Boolean(checked))}
+                      aria-labelledby="scanServiceAccessibility-label"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="scanServiceAccessibility" id="scanServiceAccessibility-label" className="font-medium cursor-pointer">
+                        Web Accessibility (WCAG)
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Checks against WCAG 2.1/2.2 guidelines.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-2">
+                    <Checkbox 
+                      id="scanServiceReadability" 
+                      checked={scanServiceReadability} 
+                      onCheckedChange={(checked) => setScanServiceReadability(Boolean(checked))}
+                      aria-labelledby="scanServiceReadability-label"
+                    />
+                     <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="scanServiceReadability" id="scanServiceReadability-label" className="font-medium cursor-pointer">
+                        Readability Analysis
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Assesses content readability using standard metrics.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-2">
+                    <Checkbox 
+                      id="scanServiceSEO" 
+                      checked={scanServiceSEO} 
+                      onCheckedChange={(checked) => setScanServiceSEO(Boolean(checked))}
+                      aria-labelledby="scanServiceSEO-label"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="scanServiceSEO" id="scanServiceSEO-label" className="font-medium cursor-pointer">
+                        Core SEO & Metadata
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Checks basic SEO metadata (titles, descriptions, OG tags, etc.).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-2">
+                    <Checkbox 
+                      id="scanServicePageHealth" 
+                      checked={scanServicePageHealth} 
+                      onCheckedChange={(checked) => setScanServicePageHealth(Boolean(checked))}
+                      aria-labelledby="scanServicePageHealth-label"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="scanServicePageHealth" id="scanServicePageHealth-label" className="font-medium cursor-pointer">
+                        Basic Page Health Checks
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Includes broken link detection and basic image optimization insights.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -212,5 +293,7 @@ export default function AdHocWebScanPage() {
     </div>
   );
 }
+
+    
 
     
