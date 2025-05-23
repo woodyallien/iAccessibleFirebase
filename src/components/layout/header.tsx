@@ -15,6 +15,13 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility, MoreVertical, HelpCircle, Info, FileText } from "lucide-react";
 import { Logo } from "./logo";
 import { CreditBalanceDisplay } from "@/components/credit-balance-display";
@@ -22,50 +29,41 @@ import { NotificationDropdown } from "@/components/notifications/notification-dr
 import React from 'react';
 
 export function Header() {
-  // Credit balance is now managed by CreditContext, CreditBalanceDisplay handles fetching it.
-
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="md:hidden" aria-label="Open navigation menu"/>
-          <div className="hidden md:block"> {/* This div is kept for layout consistency */}
+          <div className="hidden md:block">
             <Logo size="sm" />
           </div>
         </div>
 
         <div className="flex items-center gap-x-1 sm:gap-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <ScanLine className="h-4 w-4 mr-2" />
-                Quick Scan
-                <ChevronDown className="h-4 w-4 ml-1 opacity-70" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Start a New Scan</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
+          <Menubar className="rounded-md border-none p-0 h-9 bg-transparent shadow-none">
+            <MenubarMenu>
+              <MenubarTrigger asChild>
+                 <Button variant="outline" size="sm">
+                    <ScanLine className="h-4 w-4 mr-2" />
+                    Scan
+                    <ChevronDown className="h-4 w-4 ml-1 opacity-70" />
+                  </Button>
+              </MenubarTrigger>
+              <MenubarContent align="end" className="w-56">
+                <DropdownMenuLabel>Start a New Scan</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <Link href="/accessibility-check" passHref legacyBehavior>
-                  <DropdownMenuItem asChild>
+                  <MenubarItem asChild className="cursor-pointer">
                     <a>
                       <Accessibility className="mr-2 h-4 w-4" />
-                      Scan Web Page
+                      Scan a Single Web Page
                     </a>
-                  </DropdownMenuItem>
+                  </MenubarItem>
                 </Link>
-                <Link href="/pdf-scan" passHref legacyBehavior>
-                  <DropdownMenuItem asChild>
-                    <a>
-                      <FileScan className="mr-2 h-4 w-4" />
-                      Scan PDF Document
-                    </a>
-                  </DropdownMenuItem>
-                </Link>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {/* PDF Scan option can be added here if needed in menubar later */}
+              </MenubarContent>
+            </MenubarMenu>
+          </Menubar>
 
           <CreditBalanceDisplay /> 
           <NotificationDropdown />
@@ -85,10 +83,14 @@ export function Header() {
                 <Info className="mr-2 h-4 w-4" />
                 Platform Status
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => console.log("Navigate to Changelog")}>
-                <FileText className="mr-2 h-4 w-4" />
-                View Changelog
-              </DropdownMenuItem>
+              <Link href="/changelog" passHref legacyBehavior>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <a>
+                    <FileText className="mr-2 h-4 w-4" />
+                    View Changelog
+                  </a>
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -110,7 +112,7 @@ export function Header() {
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Billing</DropdownMenuItem>
               <Link href="/settings" passHref legacyBehavior>
-                <DropdownMenuItem asChild><a>Settings</a></DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer"><a>Settings</a></DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
