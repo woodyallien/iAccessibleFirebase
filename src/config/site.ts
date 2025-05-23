@@ -23,7 +23,7 @@ export const siteConfig: SiteConfig = {
       description: "Overview of your accessible application.",
     },
     {
-      title: "Ad Hoc Scans",
+      title: "Single Page Scan", // Updated from "Ad Hoc Scans"
       href: "/accessibility-check", 
       icon: Accessibility, 
       description: "Perform single web page scans.",
