@@ -13,16 +13,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarTrigger,
-} from "@/components/ui/menubar";
-import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility, MoreVertical, HelpCircle, Info, FileText } from "lucide-react";
+import { LogOut, UserCircle, MoreVertical, HelpCircle, Info, FileText } from "lucide-react";
 import { CreditBalanceDisplay } from "@/components/credit-balance-display";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
 import React from 'react';
@@ -30,15 +22,12 @@ import React from 'react';
 export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2">
+      <div className="flex h-16 items-start justify-between px-4 sm:px-6 lg:px-8"> {/* Removed 'container' class */}
+        <div className="flex items-center gap-2 pt-1 sm:pt-0"> {/* Added padding-top for mobile alignment */}
           <SidebarTrigger className="md:hidden" aria-label="Open navigation menu"/>
-          {/* Logo removed from here */}
         </div>
 
         <div className="flex items-center gap-x-1 sm:gap-x-2">
-          {/* Scan Menubar removed */}
-
           <CreditBalanceDisplay />
           <NotificationDropdown />
 
@@ -101,3 +90,4 @@ export function Header() {
   );
 }
 Header.displayName = "Header";
+
