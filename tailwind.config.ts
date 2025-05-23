@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -10,8 +11,8 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ["var(--font-plus-jakarta-sans)", "system-ui", "sans-serif"],
-        serif: ["var(--font-plus-jakarta-sans)", "Georgia", "serif"], // Added Plus Jakarta Sans for serif
+        sans: ["var(--font-outfit)", "system-ui", "sans-serif"],
+        serif: ["var(--font-outfit)", "Georgia", "serif"],
         mono: ["var(--font-jetbrains-mono)", "monospace"],
       },
   		colors: {
@@ -46,7 +47,7 @@ export default {
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
   			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))', // ShadCN uses --input for border color of inputs, was #f4f5f7, now matches general border
+  			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
   			chart: {
   				'1': 'hsl(var(--chart-1))',
