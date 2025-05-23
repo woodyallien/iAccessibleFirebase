@@ -132,13 +132,16 @@ export default function AdHocWebScanPage() {
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="advanced-options">
               <AccordionTrigger>
-                <Settings2 className="mr-2 h-4 w-4" /> Select Scan Services & Options
+                <span className="flex items-center">
+                  <Settings2 className="mr-2 h-4 w-4" />
+                  Select Scan Services & Options
+                </span>
               </AccordionTrigger>
-              <AccordionContent className="pt-4"> {/* Removed space-y-4, kept pt-4 */}
-                <p className="text-sm font-medium text-foreground mb-3"> {/* Added mb-3 */}
+              <AccordionContent className="pt-4">
+                <p className="text-sm font-medium text-foreground mb-3">
                   Choose services to include in this scan:
                 </p>
-                <div className="space-y-3 mb-4"> {/* Added mb-4 */}
+                <div className="space-y-3 mb-4">
                   <div className="flex items-start space-x-2">
                     <Checkbox 
                       id="scanServiceAccessibility" 
@@ -207,7 +210,7 @@ export default function AdHocWebScanPage() {
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground"> {/* Removed pt-3 */}
+                <p className="text-xs text-muted-foreground">
                   Note: Deselecting services will tailor your report output. The credit cost for this ad hoc scan remains fixed at {WEB_PAGE_SCAN_COST} credit(s) for the MVP.
                 </p>
               </AccordionContent>
@@ -303,4 +306,3 @@ export default function AdHocWebScanPage() {
   );
 }
     
-
