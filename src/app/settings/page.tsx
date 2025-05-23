@@ -21,13 +21,14 @@ import {
   ScrollText,
   UserCircle,
   Mail,
-  Lock
+  Lock // Added Lock icon
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
 import React, { useState, useEffect } from 'react';
 import { useCredits } from "@/contexts/credit-context"; 
+import { Separator } from "@/components/ui/separator";
 
 // --- Placeholder Data (In a real app, fetch from backend/user data) ---
 const USER_SUBSCRIPTION_TIER_NAME = "Pro Plan"; 
@@ -36,6 +37,7 @@ const IS_SUBSCRIPTION_HAS_ALLOWANCE = true;
 const IS_SUBSCRIPTION_HAS_RESET_DATE = true;
 const IS_TOP_UP_FEATURE_ENABLED = true;
 const IS_USER_NOT_ON_HIGHEST_TIER = true;
+const IS_EMAIL_PASSWORD_ACCOUNT = true; // Placeholder for conditional visibility of password section
 // --- End Placeholder Data ---
 
 export default function SettingsPage() {
@@ -44,6 +46,12 @@ export default function SettingsPage() {
   const [nextResetDate, setNextResetDate] = useState<string | null>(null);
   const [userName, setUserName] = useState("Demo User"); // Placeholder for user's full name
   const userEmail = "demo@example.com"; // Placeholder for user's email
+
+  // Password fields state (for stubbed interaction)
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
 
   useEffect(() => {
     // Calculate next reset date on the client to avoid hydration issues
@@ -62,6 +70,25 @@ export default function SettingsPage() {
     console.log("Updating profile with name:", userName);
     alert("Profile update simulated. Check console.");
   };
+
+  const handlePasswordChange = () => {
+    // In a real app, this would call an API to change the password
+    console.log("Attempting to change password with:", { currentPassword, newPassword, confirmNewPassword });
+    if (newPassword !== confirmNewPassword) {
+      alert("New password and confirmation password do not match.");
+      return;
+    }
+    if (newPassword.length < 8) {
+        alert("New password must be at least 8 characters long.");
+        return;
+    }
+    alert("Password change simulated. Check console.");
+    // Clear fields after attempt
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+  };
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -258,11 +285,66 @@ export default function SettingsPage() {
             </div>
           </div>
           {/* End Profile Information Section */}
+
+          {IS_EMAIL_PASSWORD_ACCOUNT && (
+            <>
+              <Separator className="my-6" />
+              {/* Password Management Section */}
+              <div>
+                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Lock className="h-5 w-5 text-muted-foreground" />
+                  Password Management
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <Input 
+                      id="currentPassword" 
+                      type="password" 
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="mt-1" 
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <Input 
+                      id="newPassword" 
+                      type="password" 
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="mt-1" 
+                      aria-describedby="newPassword-help"
+                      required 
+                    />
+                    <p id="newPassword-help" className="text-sm text-muted-foreground mt-1">
+                      Minimum 8 characters. Include numbers and symbols for strength.
+                    </p>
+                  </div>
+                  <div>
+                    <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
+                    <Input 
+                      id="confirmNewPassword" 
+                      type="password" 
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                      className="mt-1" 
+                      required 
+                    />
+                  </div>
+                  <Button onClick={handlePasswordChange} variant="default">Change Password</Button>
+                </div>
+              </div>
+              {/* End Password Management Section */}
+            </>
+          )}
+
         </CardContent>
       </Card>
 
       <div className="mt-4 flex justify-end">
-        <Button variant="default" disabled>Save Changes (Disabled)</Button>
+        <Button variant="default" disabled>Save All Settings (Disabled)</Button>
       </div>
 
       {/* CreditConfirmationModal is kept for completeness, though not directly triggered by settings page actions */}
@@ -288,3 +370,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    
