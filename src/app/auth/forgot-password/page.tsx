@@ -17,8 +17,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { AuthLayout } from "@/components/layout/auth-layout";
-import { Mail, ArrowLeft } from "lucide-react";
+import { Mail, ArrowLeft, Loader2 } from "lucide-react"; // Added Loader2
 import { useToast } from "@/hooks/use-toast";
+import React from "react"; // Added React for useState if needed, but react-hook-form handles isSubmitting
 
 const formSchema = z.object({
   email: z.string().email({
@@ -28,6 +29,9 @@ const formSchema = z.object({
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
+  // react-hook-form's form.formState.isSubmitting can be used directly
+  // const [isSubmitting, setIsSubmitting] = React.useState(false); 
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,17 +40,21 @@ export default function ForgotPasswordPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    // setIsSubmitting(true); // Handled by react-hook-form
     console.log("Submitting password reset request for:", values.email);
     // TODO: Implement actual password reset logic
+    
     // Simulate API call
-    form.reset(); // Reset form on submission
-    toast({
-        title: "Password Reset Email Sent",
-        description: "If an account with that email exists, a password reset link has been sent.",
-        variant: "default",
-    });
-    // For MVP, direct success message display in page isn't implemented.
-    // A toast notification or redirect would be more common.
+    // No explicit setIsSubmitting(true) needed if using form.formState.isSubmitting for button state
+    setTimeout(() => {
+      toast({
+          title: "Password Reset Email Sent",
+          description: "If an account with that email exists, a password reset link has been sent.",
+          variant: "default",
+      });
+      form.reset(); // Reset form on submission
+      // setIsSubmitting(false); // Handled by react-hook-form
+    }, 1500);
   }
 
   return (
@@ -76,6 +84,7 @@ export default function ForgotPasswordPage() {
                           {...field} 
                           className="pl-10"
                           aria-describedby="email-message"
+                          disabled={form.formState.isSubmitting}
                         />
                       </FormControl>
                     </div>
@@ -84,6 +93,7 @@ export default function ForgotPasswordPage() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {form.formState.isSubmitting ? "Sending..." : "Send Password Reset Link"}
               </Button>
             </form>
@@ -99,4 +109,3 @@ export default function ForgotPasswordPage() {
     </AuthLayout>
   );
 }
-

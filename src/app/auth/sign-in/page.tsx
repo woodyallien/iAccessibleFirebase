@@ -18,13 +18,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { AuthLayout } from "@/components/layout/auth-layout";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import React from "react";
 
 const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  password: z.string().min(1, { // Basic check for password presence
+  password: z.string().min(1, {
     message: "Password is required.",
   }),
 });
@@ -40,8 +42,10 @@ const GoogleIcon = () => (
   </svg>
 );
 
-
 export default function SignInPage() {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,14 +55,38 @@ export default function SignInPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Simulate API call
+    setIsSubmitting(true);
     console.log("Signing in with:", values);
     // TODO: Implement actual sign-in logic
+    setTimeout(() => {
+      // Simulate API call success/failure
+      const success = Math.random() > 0.3; // 70% chance of success
+      if (success) {
+        toast({
+          title: "Signed In Successfully",
+          description: "Welcome back!",
+        });
+        // form.reset(); // Optional: reset form on success
+        // TODO: Redirect to dashboard or intended page
+      } else {
+        toast({
+          title: "Sign In Failed",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
+      }
+      setIsSubmitting(false);
+    }, 1500);
   }
 
   function handleGoogleSignIn() {
     console.log("Attempting Google Sign In...");
     // TODO: Implement Google OAuth logic
+    toast({
+        title: "Google Sign-In",
+        description: "Google Sign-In functionality is not yet implemented.",
+        variant: "default"
+    })
   }
 
   return (
@@ -86,6 +114,7 @@ export default function SignInPage() {
                           {...field} 
                           className="pl-10"
                           aria-describedby="email-message"
+                          disabled={isSubmitting}
                         />
                       </FormControl>
                     </div>
@@ -108,6 +137,7 @@ export default function SignInPage() {
                           {...field} 
                           className="pl-10"
                           aria-describedby="password-message"
+                          disabled={isSubmitting}
                         />
                       </FormControl>
                     </div>
@@ -115,8 +145,9 @@ export default function SignInPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSubmitting ? "Signing In..." : "Sign In"}
               </Button>
             </form>
           </Form>
@@ -138,7 +169,7 @@ export default function SignInPage() {
             </div>
           </div>
 
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isSubmitting}>
             <GoogleIcon />
             Sign In with Google
           </Button>

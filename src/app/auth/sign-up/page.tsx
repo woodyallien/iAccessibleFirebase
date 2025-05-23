@@ -19,7 +19,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { AuthLayout } from "@/components/layout/auth-layout";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, FileText } from "lucide-react";
+import { Mail, Lock, User, Loader2 } from "lucide-react"; // Added Loader2
+import { useToast } from "@/hooks/use-toast";
+import React from "react";
 
 // Placeholder Google Icon SVG (reused from Sign In page)
 const GoogleIcon = () => (
@@ -50,6 +52,9 @@ const formSchema = z.object({
 });
 
 export default function SignUpPage() {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,14 +67,37 @@ export default function SignUpPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Simulate API call
+    setIsSubmitting(true);
     console.log("Signing up with:", values);
     // TODO: Implement actual sign-up logic
+    setTimeout(() => {
+      const success = Math.random() > 0.3; // 70% chance of success
+      if (success) {
+        toast({
+          title: "Account Created Successfully",
+          description: "Welcome to iAccessible! Please sign in.",
+        });
+        form.reset();
+        // TODO: Redirect to sign-in page or dashboard
+      } else {
+        toast({
+          title: "Sign Up Failed",
+          description: "Could not create your account. The email might already be in use or an unexpected error occurred.",
+          variant: "destructive",
+        });
+      }
+      setIsSubmitting(false);
+    }, 1500);
   }
 
   function handleGoogleSignUp() {
     console.log("Attempting Google Sign Up...");
     // TODO: Implement Google OAuth logic for sign-up
+     toast({
+        title: "Google Sign-Up",
+        description: "Google Sign-Up functionality is not yet implemented.",
+        variant: "default"
+    })
   }
 
   return (
@@ -91,7 +119,7 @@ export default function SignUpPage() {
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <FormControl>
-                        <Input placeholder="Your Name" {...field} className="pl-10" aria-describedby="fullName-message"/>
+                        <Input placeholder="Your Name" {...field} className="pl-10" aria-describedby="fullName-message" disabled={isSubmitting}/>
                       </FormControl>
                     </div>
                     <FormMessage id="fullName-message"/>
@@ -107,7 +135,7 @@ export default function SignUpPage() {
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <FormControl>
-                        <Input type="email" placeholder="you@example.com" {...field} className="pl-10" aria-describedby="email-message"/>
+                        <Input type="email" placeholder="you@example.com" {...field} className="pl-10" aria-describedby="email-message" disabled={isSubmitting}/>
                       </FormControl>
                     </div>
                     <FormMessage id="email-message"/>
@@ -123,7 +151,7 @@ export default function SignUpPage() {
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} className="pl-10" aria-describedby="password-message password-help"/>
+                        <Input type="password" placeholder="••••••••" {...field} className="pl-10" aria-describedby="password-message password-help" disabled={isSubmitting}/>
                       </FormControl>
                     </div>
                     <p id="password-help" className="text-xs text-muted-foreground mt-1">
@@ -142,7 +170,7 @@ export default function SignUpPage() {
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} className="pl-10" aria-describedby="confirmPassword-message"/>
+                        <Input type="password" placeholder="••••••••" {...field} className="pl-10" aria-describedby="confirmPassword-message" disabled={isSubmitting}/>
                       </FormControl>
                     </div>
                     <FormMessage id="confirmPassword-message"/>
@@ -159,6 +187,7 @@ export default function SignUpPage() {
                         checked={field.value}
                         onCheckedChange={field.onChange}
                         aria-describedby="terms-message"
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
@@ -177,8 +206,9 @@ export default function SignUpPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Signing Up..." : "Sign Up"}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSubmitting ? "Creating Account..." : "Sign Up"}
               </Button>
             </form>
           </Form>
@@ -194,7 +224,7 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignUp}>
+          <Button variant="outline" className="w-full" onClick={handleGoogleSignUp} disabled={isSubmitting}>
             <GoogleIcon />
             Sign Up with Google
           </Button>
@@ -211,5 +241,3 @@ export default function SignUpPage() {
     </AuthLayout>
   );
 }
-
-    
