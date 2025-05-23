@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Award, AlertTriangle, ScanLine, FileScan, Settings, FileText } from "lucide-react";
+import { Award, AlertTriangle, ScanLine, FileScan, Settings, FileText, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -62,24 +62,24 @@ export default function DashboardPage() {
         <CardContent className="grid gap-4 md:grid-cols-2 items-start">
           <div>
             <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> {/* Updated this line */}
               <Link href="/accessibility-check" passHref>
-                <Button variant="default" className="w-full sm:w-auto justify-start text-left">
+                <Button variant="default" className="w-full justify-start text-left"> {/* Removed sm:w-auto as grid handles width */}
                   <ScanLine className="mr-2 h-4 w-4" /> Scan a Web Page
                 </Button>
               </Link>
               <Link href="/reports" passHref>
-                <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
+                <Button variant="outline" className="w-full justify-start text-left"> {/* Removed sm:w-auto */}
                   <FileText className="mr-2 h-4 w-4" /> View Reports
                 </Button>
               </Link>
               <Link href="/pdf-scan" passHref>
-                <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
+                <Button variant="outline" className="w-full justify-start text-left"> {/* Removed sm:w-auto */}
                   <FileScan className="mr-2 h-4 w-4" /> Scan a PDF Document
                 </Button>
               </Link>
               <Link href="/settings" passHref>
-                <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
+                <Button variant="outline" className="w-full justify-start text-left"> {/* Removed sm:w-auto */}
                   <Settings className="mr-2 h-4 w-4" /> Manage Settings
                 </Button>
               </Link>
