@@ -22,12 +22,27 @@ import {
   UserCircle,
   Mail,
   Lock,
-  KeyRound, // Added KeyRound icon
-  ShieldCheck // Added ShieldCheck icon
+  KeyRound,
+  ShieldCheck,
+  Power, // Added for Account Actions
+  LogOut, // Added for Account Actions
+  Download, // Added for Account Actions
+  Trash2, // Added for Account Actions
+  AlertTriangle // For modal warnings
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
+import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"; // This is for credit-based actions
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog"; // For general confirmations
 import React, { useState, useEffect } from 'react';
 import { useCredits } from "@/contexts/credit-context"; 
 import { Separator } from "@/components/ui/separator";
@@ -41,44 +56,43 @@ const IS_SUBSCRIPTION_HAS_ALLOWANCE = true;
 const IS_SUBSCRIPTION_HAS_RESET_DATE = true;
 const IS_TOP_UP_FEATURE_ENABLED = true;
 const IS_USER_NOT_ON_HIGHEST_TIER = true;
-const IS_EMAIL_PASSWORD_ACCOUNT = true; // Placeholder for conditional visibility of password section
-const IS_GOOGLE_LINKED = true; // Placeholder for Google OAuth linked status
-const USER_GOOGLE_EMAIL = "user@gmail.com"; // Placeholder for linked Google email
+const IS_EMAIL_PASSWORD_ACCOUNT = true; 
+const IS_GOOGLE_LINKED = true; 
+const USER_GOOGLE_EMAIL = "user@gmail.com"; 
 // --- End Placeholder Data ---
 
 export default function SettingsPage() {
-  const { creditBalance } = useCredits(); // Dynamic value from context
+  const { creditBalance } = useCredits(); 
 
   const [nextResetDate, setNextResetDate] = useState<string | null>(null);
-  const [userName, setUserName] = useState("Demo User"); // Placeholder for user's full name
-  const userEmail = "demo@example.com"; // Placeholder for user's email
+  const [userName, setUserName] = useState("Demo User"); 
+  const userEmail = "demo@example.com"; 
 
-  // Password fields state (for stubbed interaction)
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
+  // State for general confirmation modals
+  const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [actionModalTitle, setActionModalTitle] = useState("");
+  const [actionModalDescription, setActionModalDescription] = useState("");
+  const [actionModalConfirmText, setActionModalConfirmText] = useState("Confirm");
+  const [actionModalAction, setActionModalAction] = useState<() => void>(() => {});
+  const [actionModalVariant, setActionModalVariant] = useState<"default" | "destructive">("default");
+
 
   useEffect(() => {
-    // Calculate next reset date on the client to avoid hydration issues
     const date = new Date();
     const clientNextResetDate = new Date(date.getFullYear(), date.getMonth() + 1, 1).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
     setNextResetDate(clientNextResetDate);
   }, []);
 
-  // Modal state (remains for potential future use, though not directly used by this refactor for display)
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalAction, setModalAction] = useState<() => void>(() => {});
-  const [modalCreditsRequired, setModalCreditsRequired] = useState(0);
-
   const handleProfileUpdate = () => {
-    // In a real app, this would send data to a backend
     console.log("Updating profile with name:", userName);
     alert("Profile update simulated. Check console.");
   };
 
   const handlePasswordChange = () => {
-    // In a real app, this would call an API to change the password
     console.log("Attempting to change password with:", { currentPassword, newPassword, confirmNewPassword });
     if (newPassword !== confirmNewPassword) {
       alert("New password and confirmation password do not match.");
@@ -89,19 +103,44 @@ export default function SettingsPage() {
         return;
     }
     alert("Password change simulated. Check console.");
-    // Clear fields after attempt
     setCurrentPassword("");
     setNewPassword("");
     setConfirmNewPassword("");
   };
 
   const handleGoogleDisconnect = () => {
-    // In a real app, this would trigger an OAuth disconnect flow
     if(confirm("Are you sure you want to disconnect your Google account?")) {
         console.log("Disconnecting Google Account...");
-        alert("Google account disconnect simulated. This would log the user out or require setting a password if no other auth method exists.");
-        // Update IS_GOOGLE_LINKED to false in a real app after successful disconnect
+        alert("Google account disconnect simulated.");
     }
+  };
+
+  const handleLogoutAllDevices = () => {
+    setActionModalTitle("Log Out From All Devices?");
+    setActionModalDescription("This will sign you out from all other active sessions on other browsers and devices. You will remain logged in on this device.");
+    setActionModalConfirmText("Log Out All");
+    setActionModalAction(() => () => {
+      console.log("Logging out from all devices...");
+      alert("Logged out from all devices (simulation).");
+      setIsActionModalOpen(false);
+    });
+    setActionModalVariant("destructive");
+    setIsActionModalOpen(true);
+  };
+
+  const handleDeleteAccount = () => {
+    setActionModalTitle("Delete Account Permanently?");
+    setActionModalDescription(
+      "This action is irreversible and will permanently delete your account and all associated data, including scan history and reports. This cannot be undone. Are you absolutely sure?"
+    );
+    setActionModalConfirmText("Yes, Delete My Account");
+    setActionModalAction(() => () => {
+      console.log("Deleting account...");
+      alert("Account deletion initiated (simulation).");
+      setIsActionModalOpen(false);
+    });
+    setActionModalVariant("destructive");
+    setIsActionModalOpen(true);
   };
 
 
@@ -378,7 +417,6 @@ export default function SettingsPage() {
                   <Button variant="destructive" size="sm" onClick={handleGoogleDisconnect}>Disconnect Google</Button>
                 </div>
               )}
-              {/* Add placeholders for other OAuth providers if needed e.g. GitHub, Apple */}
             </div>
           </div>
           {/* End Authentication Methods Section */}
@@ -399,6 +437,45 @@ export default function SettingsPage() {
             </Alert>
           </div>
           {/* End Two-Factor Authentication Section */}
+          
+          <Separator className="my-6" />
+          {/* Account Actions Section */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Power className="h-5 w-5 text-muted-foreground" />
+              Account Actions
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <Button variant="outline" onClick={handleLogoutAllDevices} className="w-full sm:w-auto">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log Out from All Other Devices
+                </Button>
+                <p className="text-sm text-muted-foreground mt-1">
+                  This will sign you out from all active sessions except the current one.
+                </p>
+              </div>
+
+              <Alert variant="default" className="mt-4">
+                <Download className="h-4 w-4" />
+                <AlertTitle>Export Your Data (Coming Soon)</AlertTitle>
+                <AlertDescription>
+                  Functionality to export your account data, scan history, and reports will be available here in a future update.
+                </AlertDescription>
+              </Alert>
+
+              <div>
+                <Button variant="destructive" onClick={handleDeleteAccount} className="w-full sm:w-auto">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Account
+                </Button>
+                 <p className="text-sm text-muted-foreground mt-1">
+                  Permanently delete your account and all associated data. This action is irreversible.
+                </p>
+              </div>
+            </div>
+          </div>
+          {/* End Account Actions Section */}
 
         </CardContent>
       </Card>
@@ -407,27 +484,47 @@ export default function SettingsPage() {
         <Button variant="default" disabled>Save All Settings (Disabled)</Button>
       </div>
 
-      {/* CreditConfirmationModal is kept for completeness, though not directly triggered by settings page actions */}
+      {/* General Action Confirmation Modal */}
+      <AlertDialog open={isActionModalOpen} onOpenChange={setIsActionModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              {actionModalVariant === "destructive" && <AlertTriangle className="h-6 w-6 text-destructive" />}
+              {actionModalTitle}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="py-2 text-base">
+              {actionModalDescription}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsActionModalOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={actionModalAction} className={cn(actionModalVariant === "destructive" && buttonVariants({variant: "destructive"}))}>
+              {actionModalConfirmText}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* CreditConfirmationModal is kept for completeness if other parts of settings page might need it */}
+      {/* 
       <CreditConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={modalAction}
-        creditsRequired={modalCreditsRequired}
-        currentCredits={creditBalance} // Uses dynamic creditBalance from context
+        isOpen={isCreditModalOpen} // Placeholder if settings actions required credits
+        onClose={() => setIsCreditModalOpen(false)}
+        onConfirm={() => {}} // Placeholder
+        creditsRequired={0} // Placeholder
+        currentCredits={creditBalance}
         onTopUp={() => {
-          setIsModalOpen(false);
+          setIsCreditModalOpen(false);
           const topUpSection = document.getElementById('credits-subscription');
           if (topUpSection) topUpSection.scrollIntoView({ behavior: 'smooth' });
-          console.log("Navigate to top-up credits");
         }}
         onUpgrade={() => {
-          setIsModalOpen(false);
+          setIsCreditModalOpen(false);
            const topUpSection = document.getElementById('credits-subscription');
           if (topUpSection) topUpSection.scrollIntoView({ behavior: 'smooth' });
-          console.log("Navigate to upgrade subscription");
         }}
       />
+      */}
     </div>
   );
 }
-
