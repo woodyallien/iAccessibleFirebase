@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button"; // Added buttonVariants
 import { Switch } from "@/components/ui/switch";
 import { 
   Fingerprint, 
@@ -24,15 +24,15 @@ import {
   Lock,
   KeyRound,
   ShieldCheck,
-  Power, // Added for Account Actions
-  LogOut, // Added for Account Actions
-  Download, // Added for Account Actions
-  Trash2, // Added for Account Actions
-  AlertTriangle // For modal warnings
+  Power, 
+  LogOut, 
+  Download, 
+  Trash2, 
+  AlertTriangle 
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"; // This is for credit-based actions
+import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"; 
 import { 
   AlertDialog, 
   AlertDialogAction, 
@@ -42,11 +42,12 @@ import {
   AlertDialogFooter, 
   AlertDialogHeader, 
   AlertDialogTitle 
-} from "@/components/ui/alert-dialog"; // For general confirmations
+} from "@/components/ui/alert-dialog"; 
 import React, { useState, useEffect } from 'react';
 import { useCredits } from "@/contexts/credit-context"; 
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils"; // Added cn import
 
 
 // --- Placeholder Data (In a real app, fetch from backend/user data) ---
@@ -528,3 +529,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    
