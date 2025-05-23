@@ -23,22 +23,22 @@ export const siteConfig: SiteConfig = {
       description: "Overview of your accessible application.",
     },
     {
-      title: "Ad Hoc Scans", // Renamed for clarity
-      href: "/accessibility-check", // Existing single page scan
-      icon: Accessibility, // Keep this for general web accessibility
-      description: "Perform single web page or PDF scans.",
+      title: "Ad Hoc Scans",
+      href: "/accessibility-check", 
+      icon: Accessibility, 
+      description: "Perform single web page scans.",
     },
-    // { // Domain Scan might be a sub-section or a new top-level item post-MVP or if very distinct
-    //   title: "Domain Scans",
-    //   href: "/domain-scan", // Example path for a dedicated domain scan section
-    //   icon: ScanSearch,
-    //   description: "Manage and initiate full domain scans."
-    // },
     {
       title: "PDF Scan",
       href: "/pdf-scan",
       icon: FileScan,
       description: "Scan a PDF document for accessibility issues.",
+    },
+    {
+      title: "Add Domain Scan",
+      href: "/domain-scan/add",
+      icon: ScanSearch,
+      description: "Add a new site for comprehensive domain scanning."
     },
     {
       title: "Reports",
