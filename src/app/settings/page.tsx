@@ -21,7 +21,9 @@ import {
   ScrollText,
   UserCircle,
   Mail,
-  Lock // Added Lock icon
+  Lock,
+  KeyRound, // Added KeyRound icon
+  ShieldCheck // Added ShieldCheck icon
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +31,8 @@ import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"
 import React, { useState, useEffect } from 'react';
 import { useCredits } from "@/contexts/credit-context"; 
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 
 // --- Placeholder Data (In a real app, fetch from backend/user data) ---
 const USER_SUBSCRIPTION_TIER_NAME = "Pro Plan"; 
@@ -38,6 +42,8 @@ const IS_SUBSCRIPTION_HAS_RESET_DATE = true;
 const IS_TOP_UP_FEATURE_ENABLED = true;
 const IS_USER_NOT_ON_HIGHEST_TIER = true;
 const IS_EMAIL_PASSWORD_ACCOUNT = true; // Placeholder for conditional visibility of password section
+const IS_GOOGLE_LINKED = true; // Placeholder for Google OAuth linked status
+const USER_GOOGLE_EMAIL = "user@gmail.com"; // Placeholder for linked Google email
 // --- End Placeholder Data ---
 
 export default function SettingsPage() {
@@ -87,6 +93,15 @@ export default function SettingsPage() {
     setCurrentPassword("");
     setNewPassword("");
     setConfirmNewPassword("");
+  };
+
+  const handleGoogleDisconnect = () => {
+    // In a real app, this would trigger an OAuth disconnect flow
+    if(confirm("Are you sure you want to disconnect your Google account?")) {
+        console.log("Disconnecting Google Account...");
+        alert("Google account disconnect simulated. This would log the user out or require setting a password if no other auth method exists.");
+        // Update IS_GOOGLE_LINKED to false in a real app after successful disconnect
+    }
   };
 
 
@@ -339,6 +354,51 @@ export default function SettingsPage() {
               {/* End Password Management Section */}
             </>
           )}
+          
+          <Separator className="my-6" />
+          {/* Authentication Methods Section */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-muted-foreground" />
+              Authentication Methods
+            </h3>
+            <div className="space-y-4">
+              {IS_EMAIL_PASSWORD_ACCOUNT && (
+                <div className="p-4 border rounded-md bg-muted/30 shadow-sm">
+                  <p className="font-medium text-foreground">Email & Password</p>
+                  <p className="text-sm text-muted-foreground">Primary authentication method.</p>
+                </div>
+              )}
+              {IS_GOOGLE_LINKED && (
+                <div className="p-4 border rounded-md bg-muted/30 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                  <div>
+                    <p className="font-medium text-foreground">Connected with Google</p>
+                    <p className="text-sm text-muted-foreground">Signed in as: {USER_GOOGLE_EMAIL}</p>
+                  </div>
+                  <Button variant="destructive" size="sm" onClick={handleGoogleDisconnect}>Disconnect Google</Button>
+                </div>
+              )}
+              {/* Add placeholders for other OAuth providers if needed e.g. GitHub, Apple */}
+            </div>
+          </div>
+          {/* End Authentication Methods Section */}
+
+          <Separator className="my-6" />
+          {/* Two-Factor Authentication Section */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+              Two-Factor Authentication (2FA)
+            </h3>
+            <Alert variant="default">
+                <ShieldCheck className="h-4 w-4" />
+                <AlertTitle>Coming Soon!</AlertTitle>
+                <AlertDescription>
+                Enhance your account security with Two-Factor Authentication. This feature is currently under development and will be available in a future update.
+                </AlertDescription>
+            </Alert>
+          </div>
+          {/* End Two-Factor Authentication Section */}
 
         </CardContent>
       </Card>
@@ -371,4 +431,3 @@ export default function SettingsPage() {
   );
 }
 
-    
