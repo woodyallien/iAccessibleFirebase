@@ -42,6 +42,8 @@ export default function SettingsPage() {
   const { creditBalance } = useCredits(); // Dynamic value from context
 
   const [nextResetDate, setNextResetDate] = useState<string | null>(null);
+  const [userName, setUserName] = useState("Demo User"); // Placeholder for user's full name
+  const userEmail = "demo@example.com"; // Placeholder for user's email
 
   useEffect(() => {
     // Calculate next reset date on the client to avoid hydration issues
@@ -54,6 +56,12 @@ export default function SettingsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState<() => void>(() => {});
   const [modalCreditsRequired, setModalCreditsRequired] = useState(0);
+
+  const handleProfileUpdate = () => {
+    // In a real app, this would send data to a backend
+    console.log("Updating profile with name:", userName);
+    alert("Profile update simulated. Check console.");
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -174,7 +182,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-6 w-6 text-primary" aria-hidden="true"/>
-            Notifications (Coming Soon)
+            Notifications
           </CardTitle>
           <CardDescription>Manage your notification preferences. This feature is under development but will allow you to control in-app and email alerts.</CardDescription>
         </CardHeader>
@@ -214,7 +222,42 @@ export default function SettingsPage() {
           <CardDescription>Manage your profile details, password, and account security settings.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Content for account management will be added in subsequent steps */}
+          {/* Profile Information Section */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <UserCircle className="h-5 w-5 text-muted-foreground" />
+              Profile Information
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="userName" className="text-base font-medium">Full Name</Label>
+                <Input 
+                  id="userName" 
+                  type="text" 
+                  value={userName} 
+                  onChange={(e) => setUserName(e.target.value)} 
+                  placeholder="Enter your full name" 
+                  className="mt-1"
+                  aria-describedby="userName-help"
+                />
+                <p id="userName-help" className="text-sm text-muted-foreground mt-1">How your name appears in the application.</p>
+              </div>
+              <div>
+                <Label htmlFor="userEmail" className="text-base font-medium">Email Address</Label>
+                <Input 
+                  id="userEmail" 
+                  type="email" 
+                  value={userEmail} 
+                  readOnly 
+                  className="mt-1 bg-muted/50 cursor-not-allowed" 
+                  aria-describedby="userEmail-help"
+                />
+                <p id="userEmail-help" className="text-sm text-muted-foreground mt-1">Your email address cannot be changed here. Contact support for assistance.</p>
+              </div>
+              <Button onClick={handleProfileUpdate} variant="default">Update Profile</Button>
+            </div>
+          </div>
+          {/* End Profile Information Section */}
         </CardContent>
       </Card>
 
@@ -245,4 +288,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-
