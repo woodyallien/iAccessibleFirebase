@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -20,7 +21,7 @@ export function SidebarNav() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="p-4">
+      <div className="p-4 group-data-[collapsible=icon]:p-2 transition-all duration-200 ease-linear">
         <Logo />
       </div>
       <Separator className="mb-2" />
