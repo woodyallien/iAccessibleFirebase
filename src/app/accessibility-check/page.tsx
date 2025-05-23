@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox"; // Added Checkbox
+import { Checkbox } from "@/components/ui/checkbox";
 import { ScanLine, Zap, Settings2, Save, FileTextIcon, Info, ScanSearch } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from 'react';
@@ -40,7 +40,7 @@ export default function AdHocWebScanPage() {
       return;
     }
     // Log selected services (for future use)
-    console.log("Selected services:", {
+    console.log("Selected services for report:", {
       accessibility: scanServiceAccessibility,
       readability: scanServiceReadability,
       seo: scanServiceSEO,
@@ -56,10 +56,17 @@ export default function AdHocWebScanPage() {
     
     deductCredits(WEB_PAGE_SCAN_COST);
     console.log(`Scanning URL: ${urlToScan}. Deducted ${WEB_PAGE_SCAN_COST} credits.`);
+    // Log selected services (for future use when generating actual report)
+    console.log("Scan initiated with selected services:", {
+      accessibility: scanServiceAccessibility,
+      readability: scanServiceReadability,
+      seo: scanServiceSEO,
+      pageHealth: scanServicePageHealth,
+    });
     
     setTimeout(() => {
       setIsScanning(false);
-      setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Full report details would appear here.`);
+      setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Full report details (filtered by your selections) would appear here.`);
     }, 2000);
   };
 
@@ -201,6 +208,9 @@ export default function AdHocWebScanPage() {
                     </div>
                   </div>
                 </div>
+                <p className="text-xs text-muted-foreground pt-3">
+                  Note: Deselecting services will tailor your report output. The credit cost for this ad hoc scan remains fixed at {WEB_PAGE_SCAN_COST} credit(s) for the MVP.
+                </p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -293,7 +303,6 @@ export default function AdHocWebScanPage() {
     </div>
   );
 }
-
     
 
     
