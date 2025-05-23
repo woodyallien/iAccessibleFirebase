@@ -40,7 +40,7 @@ export default function AdHocWebScanPage() {
       return;
     }
     // Log selected services (for future use)
-    console.log("Selected services for report:", {
+    console.log("Pre-scan check. Selected services for report:", {
       accessibility: scanServiceAccessibility,
       readability: scanServiceReadability,
       seo: scanServiceSEO,
@@ -54,19 +54,23 @@ export default function AdHocWebScanPage() {
     setIsScanning(true);
     setScanResult(null);
     
-    deductCredits(WEB_PAGE_SCAN_COST);
-    console.log(`Scanning URL: ${urlToScan}. Deducted ${WEB_PAGE_SCAN_COST} credits.`);
-    // Log selected services (for future use when generating actual report)
-    console.log("Scan initiated with selected services:", {
+    deductCredits(WEB_PAGE_SCAN_COST); // Credit deduction
+
+    const servicesToScan = {
       accessibility: scanServiceAccessibility,
       readability: scanServiceReadability,
       seo: scanServiceSEO,
       pageHealth: scanServicePageHealth,
-    });
+    };
+
+    // Simulate passing data to backend
+    console.log(`Initiating scan for URL: ${urlToScan}`);
+    console.log(`Selected services for scan (would be passed to backend):`, servicesToScan);
+    console.log(`Credits deducted: ${WEB_PAGE_SCAN_COST}`);
     
     setTimeout(() => {
       setIsScanning(false);
-      setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Full report details (filtered by your selections) would appear here.`);
+      setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Report details (filtered by your service selections) would appear here.`);
     }, 2000);
   };
 
@@ -303,6 +307,4 @@ export default function AdHocWebScanPage() {
     </div>
   );
 }
-    
-
     
