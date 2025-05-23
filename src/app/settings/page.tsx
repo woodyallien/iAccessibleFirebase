@@ -209,36 +209,12 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Fingerprint className="h-6 w-6 text-primary" aria-hidden="true"/>
-            Account (Coming Soon)
+            Account Management
           </CardTitle>
-          <CardDescription>Manage your account details. This feature is under development but will include profile and security options.</CardDescription>
+          <CardDescription>Manage your profile details, password, and account security settings.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-            <div className="space-y-2 p-4 border rounded-lg shadow-sm">
-                <div className="space-y-1">
-                    <Label htmlFor="account-name" className="text-base font-medium">Full Name</Label>
-                    <div className="flex items-center gap-2">
-                        <UserCircle className="h-5 w-5 text-muted-foreground" />
-                        <Input id="account-name" placeholder="Your Name" disabled value="Jane Doe (Placeholder)" />
-                    </div>
-                </div>
-                 <div className="space-y-1">
-                    <Label htmlFor="account-email" className="text-base font-medium">Email Address</Label>
-                     <div className="flex items-center gap-2">
-                        <Mail className="h-5 w-5 text-muted-foreground" />
-                        <Input id="account-email" type="email" placeholder="your@email.com" disabled value="jane.doe@example.com (Placeholder)" />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Email address cannot be changed via this interface.</p>
-                </div>
-            </div>
-            <div className="space-y-2 p-4 border rounded-lg shadow-sm">
-                <h4 className="font-medium text-foreground">Security</h4>
-                 <div className="flex items-center gap-2">
-                    <Lock className="h-5 w-5 text-muted-foreground" />
-                    <Button variant="outline" disabled>Change Password</Button>
-                </div>
-            </div>
-            <p className="text-sm text-muted-foreground">Options for profile updates and security settings will be available here in a future update.</p>
+          {/* Content for account management will be added in subsequent steps */}
         </CardContent>
       </Card>
 
@@ -269,3 +245,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+
