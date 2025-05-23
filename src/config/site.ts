@@ -17,7 +17,7 @@ export const siteConfig: SiteConfig = {
   ogImage: "https://example.com/og.jpg", // Replace with your actual OG image URL
   sidebarNav: [
     {
-      title: "Dashboard",
+      title: "Main Dashboard",
       href: "/",
       icon: LayoutDashboard,
       description: "Overview of your accessible application.",
