@@ -37,32 +37,9 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-x-1 sm:gap-x-2">
-          <Menubar className="rounded-md border-none p-0 h-9 bg-transparent shadow-none">
-            <MenubarMenu>
-              <MenubarTrigger asChild>
-                 <Button variant="outline" size="sm">
-                    <ScanLine className="h-4 w-4 mr-2" />
-                    Scan
-                    <ChevronDown className="h-4 w-4 ml-1 opacity-70" />
-                  </Button>
-              </MenubarTrigger>
-              <MenubarContent align="end" className="w-56">
-                <DropdownMenuLabel>Start a New Scan</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <Link href="/accessibility-check" passHref legacyBehavior>
-                  <MenubarItem asChild className="cursor-pointer">
-                    <a>
-                      <Accessibility className="mr-2 h-4 w-4" />
-                      Scan a Single Web Page
-                    </a>
-                  </MenubarItem>
-                </Link>
-                {/* PDF Scan option can be added here if needed in menubar later */}
-              </MenubarContent>
-            </MenubarMenu>
-          </Menubar>
+          {/* Scan Menubar removed */}
 
-          <CreditBalanceDisplay /> 
+          <CreditBalanceDisplay />
           <NotificationDropdown />
 
           <DropdownMenu>
