@@ -39,13 +39,6 @@ export default function AdHocWebScanPage() {
       setError("Please enter a valid URL starting with http:// or https://.");
       return;
     }
-    // Log selected services (for future use)
-    console.log("Pre-scan check. Selected services for report:", {
-      accessibility: scanServiceAccessibility,
-      readability: scanServiceReadability,
-      seo: scanServiceSEO,
-      pageHealth: scanServicePageHealth,
-    });
     setIsModalOpen(true);
   };
 
@@ -70,7 +63,7 @@ export default function AdHocWebScanPage() {
     
     setTimeout(() => {
       setIsScanning(false);
-      setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Report details (filtered by your service selections) would appear here.`);
+      setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Report details (filtered by your service selections: Accessibility: ${scanServiceAccessibility}, Readability: ${scanServiceReadability}, SEO: ${scanServiceSEO}, Page Health: ${scanServicePageHealth}) would appear here.`);
     }, 2000);
   };
 
@@ -141,9 +134,11 @@ export default function AdHocWebScanPage() {
               <AccordionTrigger>
                 <Settings2 className="mr-2 h-4 w-4" /> Select Scan Services & Options
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-4">
-                <p className="text-sm font-medium text-foreground mb-2">Choose services to include in this scan:</p>
-                <div className="space-y-3">
+              <AccordionContent className="pt-4"> {/* Removed space-y-4, kept pt-4 */}
+                <p className="text-sm font-medium text-foreground mb-3"> {/* Added mb-3 */}
+                  Choose services to include in this scan:
+                </p>
+                <div className="space-y-3 mb-4"> {/* Added mb-4 */}
                   <div className="flex items-start space-x-2">
                     <Checkbox 
                       id="scanServiceAccessibility" 
@@ -187,7 +182,7 @@ export default function AdHocWebScanPage() {
                     />
                     <div className="grid gap-1.5 leading-none">
                       <Label htmlFor="scanServiceSEO" id="scanServiceSEO-label" className="font-medium cursor-pointer">
-                        Core SEO & Metadata
+                        Core SEO &amp; Metadata
                       </Label>
                       <p className="text-xs text-muted-foreground">
                         Checks basic SEO metadata (titles, descriptions, OG tags, etc.).
@@ -212,7 +207,7 @@ export default function AdHocWebScanPage() {
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground pt-3">
+                <p className="text-xs text-muted-foreground"> {/* Removed pt-3 */}
                   Note: Deselecting services will tailor your report output. The credit cost for this ad hoc scan remains fixed at {WEB_PAGE_SCAN_COST} credit(s) for the MVP.
                 </p>
               </AccordionContent>
@@ -308,3 +303,4 @@ export default function AdHocWebScanPage() {
   );
 }
     
+
