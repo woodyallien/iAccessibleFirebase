@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
-import { Button, buttonVariants } from "@/components/ui/button"; // Added buttonVariants
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { 
   Fingerprint, 
@@ -28,11 +28,11 @@ import {
   LogOut, 
   Download, 
   Trash2, 
-  AlertTriangle 
+  AlertTriangle,
+  Loader2 // Added for loading spinner
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CreditConfirmationModal } from "@/components/credit-confirmation-modal"; 
 import { 
   AlertDialog, 
   AlertDialogAction, 
@@ -47,7 +47,8 @@ import React, { useState, useEffect } from 'react';
 import { useCredits } from "@/contexts/credit-context"; 
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { cn } from "@/lib/utils"; // Added cn import
+import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast"; // Added useToast import
 
 
 // --- Placeholder Data (In a real app, fetch from backend/user data) ---
@@ -64,6 +65,7 @@ const USER_GOOGLE_EMAIL = "user@gmail.com";
 
 export default function SettingsPage() {
   const { creditBalance } = useCredits(); 
+  const { toast } = useToast(); // Initialize toast
 
   const [nextResetDate, setNextResetDate] = useState<string | null>(null);
   const [userName, setUserName] = useState("Demo User"); 
@@ -72,6 +74,9 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
+  const [isProfileUpdating, setIsProfileUpdating] = useState(false);
+  const [isPasswordChanging, setIsPasswordChanging] = useState(false);
 
   // State for general confirmation modals
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
@@ -89,31 +94,87 @@ export default function SettingsPage() {
   }, []);
 
   const handleProfileUpdate = () => {
+    setIsProfileUpdating(true);
     console.log("Updating profile with name:", userName);
-    alert("Profile update simulated. Check console.");
+    // Simulate API call
+    setTimeout(() => {
+      // Simulate success/failure
+      const success = Math.random() > 0.2; // 80% chance of success
+      if (success) {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile information has been successfully updated.",
+          variant: "default", 
+        });
+      } else {
+        toast({
+          title: "Update Failed",
+          description: "Could not update your profile. Please try again.",
+          variant: "destructive",
+        });
+      }
+      setIsProfileUpdating(false);
+    }, 1500);
   };
 
   const handlePasswordChange = () => {
-    console.log("Attempting to change password with:", { currentPassword, newPassword, confirmNewPassword });
     if (newPassword !== confirmNewPassword) {
-      alert("New password and confirmation password do not match.");
+      toast({
+        title: "Password Mismatch",
+        description: "New password and confirmation password do not match.",
+        variant: "destructive",
+      });
       return;
     }
     if (newPassword.length < 8) {
-        alert("New password must be at least 8 characters long.");
+        toast({
+          title: "Weak Password",
+          description: "New password must be at least 8 characters long.",
+          variant: "destructive",
+        });
         return;
     }
-    alert("Password change simulated. Check console.");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmNewPassword("");
+    setIsPasswordChanging(true);
+    console.log("Attempting to change password with:", { currentPassword, newPassword, confirmNewPassword });
+    // Simulate API call
+    setTimeout(() => {
+      // Simulate success/failure (e.g., current password incorrect)
+      const success = Math.random() > 0.3; // 70% chance of success
+      if (success) {
+        toast({
+          title: "Password Changed",
+          description: "Your password has been successfully changed.",
+          variant: "default",
+        });
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      } else {
+         toast({
+          title: "Password Change Failed",
+          description: "Could not change your password. Please check your current password or try again.",
+          variant: "destructive",
+        });
+      }
+      setIsPasswordChanging(false);
+    }, 2000);
   };
 
   const handleGoogleDisconnect = () => {
-    if(confirm("Are you sure you want to disconnect your Google account?")) {
-        console.log("Disconnecting Google Account...");
-        alert("Google account disconnect simulated.");
-    }
+     setActionModalTitle("Disconnect Google Account?");
+    setActionModalDescription("Are you sure you want to disconnect your Google account? You will need to set a password if you haven't already to log in with email.");
+    setActionModalConfirmText("Disconnect");
+    setActionModalAction(() => () => {
+      console.log("Disconnecting Google Account...");
+      // Simulate API call
+      setTimeout(() => {
+        toast({ title: "Google Account Disconnected", description: "Your Google account has been unlinked." });
+        setIsActionModalOpen(false);
+        // Update IS_GOOGLE_LINKED state if it were a real state variable
+      }, 1000);
+    });
+    setActionModalVariant("destructive");
+    setIsActionModalOpen(true);
   };
 
   const handleLogoutAllDevices = () => {
@@ -122,8 +183,11 @@ export default function SettingsPage() {
     setActionModalConfirmText("Log Out All");
     setActionModalAction(() => () => {
       console.log("Logging out from all devices...");
-      alert("Logged out from all devices (simulation).");
-      setIsActionModalOpen(false);
+      // Simulate API call
+      setTimeout(() => {
+        toast({ title: "Logged Out Elsewhere", description: "You have been logged out from all other devices." });
+        setIsActionModalOpen(false);
+      }, 1000);
     });
     setActionModalVariant("destructive");
     setIsActionModalOpen(true);
@@ -137,8 +201,12 @@ export default function SettingsPage() {
     setActionModalConfirmText("Yes, Delete My Account");
     setActionModalAction(() => () => {
       console.log("Deleting account...");
-      alert("Account deletion initiated (simulation).");
-      setIsActionModalOpen(false);
+      // Simulate API call
+      setTimeout(() => {
+        toast({ title: "Account Deletion Initiated", description: "Your account deletion process has started. You will be logged out shortly.", variant: "destructive" });
+        setIsActionModalOpen(false);
+        // Add actual logout and redirect logic here
+      }, 2000);
     });
     setActionModalVariant("destructive");
     setIsActionModalOpen(true);
@@ -321,6 +389,7 @@ export default function SettingsPage() {
                   placeholder="Enter your full name" 
                   className="mt-1"
                   aria-describedby="userName-help"
+                  disabled={isProfileUpdating}
                 />
                 <p id="userName-help" className="text-sm text-muted-foreground mt-1">How your name appears in the application.</p>
               </div>
@@ -336,7 +405,10 @@ export default function SettingsPage() {
                 />
                 <p id="userEmail-help" className="text-sm text-muted-foreground mt-1">Your email address cannot be changed here. Contact support for assistance.</p>
               </div>
-              <Button onClick={handleProfileUpdate} variant="default">Update Profile</Button>
+              <Button onClick={handleProfileUpdate} variant="default" disabled={isProfileUpdating}>
+                {isProfileUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isProfileUpdating ? "Updating..." : "Update Profile"}
+              </Button>
             </div>
           </div>
           {/* End Profile Information Section */}
@@ -360,6 +432,7 @@ export default function SettingsPage() {
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       className="mt-1" 
                       required 
+                      disabled={isPasswordChanging}
                     />
                   </div>
                   <div>
@@ -372,6 +445,7 @@ export default function SettingsPage() {
                       className="mt-1" 
                       aria-describedby="newPassword-help"
                       required 
+                      disabled={isPasswordChanging}
                     />
                     <p id="newPassword-help" className="text-sm text-muted-foreground mt-1">
                       Minimum 8 characters. Include numbers and symbols for strength.
@@ -386,9 +460,13 @@ export default function SettingsPage() {
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
                       className="mt-1" 
                       required 
+                      disabled={isPasswordChanging}
                     />
                   </div>
-                  <Button onClick={handlePasswordChange} variant="default">Change Password</Button>
+                  <Button onClick={handlePasswordChange} variant="default" disabled={isPasswordChanging}>
+                    {isPasswordChanging && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isPasswordChanging ? "Changing..." : "Change Password"}
+                  </Button>
                 </div>
               </div>
               {/* End Password Management Section */}
@@ -481,10 +559,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <div className="mt-4 flex justify-end">
-        <Button variant="default" disabled>Save All Settings (Disabled)</Button>
-      </div>
-
       {/* General Action Confirmation Modal */}
       <AlertDialog open={isActionModalOpen} onOpenChange={setIsActionModalOpen}>
         <AlertDialogContent>
@@ -505,27 +579,6 @@ export default function SettingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* CreditConfirmationModal is kept for completeness if other parts of settings page might need it */}
-      {/* 
-      <CreditConfirmationModal
-        isOpen={isCreditModalOpen} // Placeholder if settings actions required credits
-        onClose={() => setIsCreditModalOpen(false)}
-        onConfirm={() => {}} // Placeholder
-        creditsRequired={0} // Placeholder
-        currentCredits={creditBalance}
-        onTopUp={() => {
-          setIsCreditModalOpen(false);
-          const topUpSection = document.getElementById('credits-subscription');
-          if (topUpSection) topUpSection.scrollIntoView({ behavior: 'smooth' });
-        }}
-        onUpgrade={() => {
-          setIsCreditModalOpen(false);
-           const topUpSection = document.getElementById('credits-subscription');
-          if (topUpSection) topUpSection.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
-      */}
     </div>
   );
 }
