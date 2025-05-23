@@ -23,7 +23,6 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { LogOut, UserCircle, ScanLine, FileScan, ChevronDown, Accessibility, MoreVertical, HelpCircle, Info, FileText } from "lucide-react";
-import { Logo } from "./logo";
 import { CreditBalanceDisplay } from "@/components/credit-balance-display";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
 import React from 'react';
@@ -34,9 +33,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="md:hidden" aria-label="Open navigation menu"/>
-          <div className="hidden md:block">
-            <Logo size="sm" />
-          </div>
+          {/* Logo removed from here */}
         </div>
 
         <div className="flex items-center gap-x-1 sm:gap-x-2">
