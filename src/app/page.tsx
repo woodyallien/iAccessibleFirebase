@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, CheckCircle, AlertTriangle, ScanLine, FileScan, Settings, FileText, Award } from "lucide-react";
+import { ArrowUpRight, Award, AlertTriangle, ScanLine, FileScan, Settings, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -68,14 +68,14 @@ export default function DashboardPage() {
                   <ScanLine className="mr-2 h-4 w-4" /> Scan a Web Page
                 </Button>
               </Link>
+              <Link href="/reports" passHref>
+                <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
+                  <FileText className="mr-2 h-4 w-4" /> View Reports
+                </Button>
+              </Link>
               <Link href="/pdf-scan" passHref>
                 <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
                   <FileScan className="mr-2 h-4 w-4" /> Scan a PDF Document
-                </Button>
-              </Link>
-               <Link href="/reports" passHref>
-                <Button variant="outline" className="w-full sm:w-auto justify-start text-left">
-                  <FileText className="mr-2 h-4 w-4" /> View Reports
                 </Button>
               </Link>
               <Link href="/settings" passHref>
