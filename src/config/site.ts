@@ -41,7 +41,7 @@ export const siteConfig: SiteConfig = {
       description: "Add a new site for comprehensive domain scanning."
     },
     {
-      title: "Reports",
+      title: "Reports Builder",
       href: "/reports",
       icon: FileText,
       description: "View and generate accessibility reports.",
