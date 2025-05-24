@@ -45,3 +45,6 @@ firebase-debug.log
 firestore-debug.log"key" 
 key
 firestore-debug.log
+
+equal-access/
+results/

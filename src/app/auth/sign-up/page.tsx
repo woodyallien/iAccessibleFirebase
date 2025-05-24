@@ -6,8 +6,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/firebase/config"; // Import auth
+import { auth, db } from "@/lib/firebase/config"; // Import auth and db
 import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from "firebase/auth"; // Import Firebase auth functions and Google Auth
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'; // Import Firestore functions
 import {
   Form,
   FormControl,
@@ -82,10 +83,13 @@ export default function SignUpPage() {
         displayName: values.fullName,
       });
 
-      console.log("User signed up:", userCredential.user);
+      // Create user profile in Firestore
+      await createUserProfileInFirestore(userCredential.user, values);
+
+      console.log("User signed up and profile created:", userCredential.user);
       toast({
         title: "Account Created Successfully",
-        description: "Please sign in.",
+        description: "Your profile has been set up. Please sign in.",
       });
       form.reset();
       router.push('/auth/sign-in'); // Redirect to sign-in page
@@ -111,6 +115,40 @@ export default function SignUpPage() {
       setIsSubmitting(false);
     }
   }
+
+  // Async function to create user profile in Firestore
+  async function createUserProfileInFirestore(user: any, values: z.infer<typeof formSchema>) {
+    if (!user || !user.uid) {
+      console.error("Cannot create Firestore profile: User object is invalid.");
+      return; // Or throw an error
+    }
+
+    const userRef = doc(db, "users", user.uid);
+
+    const userProfileData = {
+      email: user.email,
+      fullName: user.displayName || values.fullName, // Use displayName if available (e.g., from Google), otherwise use form value
+      authProvider: user.providerData[0]?.providerId || "password",
+      creditBalance: 100, // Default credits
+      subscriptionTierId: "free_tier_mvp", // Default tier ID
+      activeSubscriptionId: null,
+      themePreference: "system",
+      notificationPreferences: { scanCompleteEmail: true, lowCreditWarningApp: true },
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      lastLoginAt: serverTimestamp(), // Or set this on actual login
+    };
+
+    try {
+      await setDoc(userRef, userProfileData);
+      console.log(`Firestore user profile created for UID: ${user.uid}`);
+    } catch (firestoreError) {
+      console.error(`Error creating Firestore user profile for UID: ${user.uid}:`, firestoreError);
+      // Decide how to handle this error - maybe log to a separate error tracking system
+      // or attempt to delete the auth user if profile creation is critical.
+    }
+  }
+
 
   async function handleGoogleSignUp() {
     setIsSubmitting(true); // Disable button during Google sign-up

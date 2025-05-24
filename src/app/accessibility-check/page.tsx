@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,19 +11,22 @@ import Image from "next/image";
 import React, { useState } from 'react';
 import { CreditConfirmationModal } from "@/components/credit-confirmation-modal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useCredits } from "@/contexts/credit-context"; 
+import { useCredits } from "@/contexts/credit-context";
+import { useAuth } from '@/contexts/auth-context'; // Import useAuth hook
 import Link from "next/link";
 
 // Placeholder for credit cost. In a real app, this would be fetched from config or backend.
 const WEB_PAGE_SCAN_COST = 10;
 
 export default function AdHocWebScanPage() {
-  const { creditBalance, deductCredits } = useCredits(); 
+  const { creditBalance, deductCredits } = useCredits();
+  const { currentUser } = useAuth(); // Get currentUser from useAuth hook
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [urlToScan, setUrlToScan] = useState("");
   const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<string | null>(null);
+  // TODO: Define a more specific type for scanResult based on the API report structure
+  const [scanResult, setScanResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // State for scan service checkboxes
@@ -34,7 +36,7 @@ export default function AdHocWebScanPage() {
   const [scanServicePageHealth, setScanServicePageHealth] = useState(true);
 
   const handleScanAttempt = () => {
-    setError(null);
+    setError(null); // Clear previous errors
     if (!urlToScan.trim() || !urlToScan.startsWith("http")) {
       setError("Please enter a valid URL starting with http:// or https://.");
       return;
@@ -42,11 +44,36 @@ export default function AdHocWebScanPage() {
     setIsModalOpen(true);
   };
 
-  const performActualScan = () => {
+  const performActualScan = async () => { // Made async
     setIsModalOpen(false);
     setIsScanning(true);
-    setScanResult(null);
-    
+    setScanResult(null); // Clear previous scan results
+
+    // Check if currentUser exists and get ID token
+    if (!currentUser) {
+      setError("User not authenticated. Please sign in to perform a scan.");
+      setIsScanning(false);
+      // Optionally, you can use your toast hook here as well
+      // toast({ title: "Authentication Required", description: "Please sign in to scan.", variant: "destructive" });
+      return;
+    }
+
+    let idToken;
+    try {
+      idToken = await currentUser.getIdToken(); // This gets the current user's Firebase ID token
+    } catch (error) {
+      console.error("Error getting ID token:", error);
+      setError("Could not authenticate your session. Please try signing out and in again.");
+      setIsScanning(false);
+      return;
+    }
+
+    if (!idToken) { // Should not happen if currentUser exists and getIdToken() succeeds, but as a safeguard
+        setError("Failed to retrieve authentication token. Please try again.");
+        setIsScanning(false);
+        return;
+    }
+
     deductCredits(WEB_PAGE_SCAN_COST); // Credit deduction
 
     const servicesToScan = {
@@ -56,15 +83,38 @@ export default function AdHocWebScanPage() {
       pageHealth: scanServicePageHealth,
     };
 
-    // Simulate passing data to backend
-    console.log(`Initiating scan for URL: ${urlToScan}`);
-    console.log(`Selected services for scan (would be passed to backend):`, servicesToScan);
-    console.log(`Credits deducted: ${WEB_PAGE_SCAN_COST}`);
-    
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/scan/webpage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}` // Add Authorization header
+        },
+        body: JSON.stringify({ url: urlToScan, servicesToScan }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          if (data.data && data.data.report) { // Check for data.data and data.data.report (API returns 'report')
+            setScanResult(data.data.report); // Store the full report object
+            console.log("Full Scan Report from API:", data.data.report); // Log the full report
+          } else {
+            setScanResult("Scan request processed. Accessibility check was not selected or no report was generated for it.");
+          }
+        } else {
+          setError(data.message || 'Scan failed with an unknown error.');
+        }
+      } else {
+        const errData = await response.json().catch(() => null);
+        setError(errData?.message || response.statusText || 'Scan API request failed with a network or server error.');
+      }
+    } catch (error: any) {
+      console.error("Error calling scan API:", error);
+      setError(`An unexpected error occurred: ${error.message}`);
+    } finally {
       setIsScanning(false);
-      setScanResult(`Scan for ${urlToScan} completed. Issues found: 5 Critical, 12 Warnings. Report details (filtered by your service selections: Accessibility: ${scanServiceAccessibility}, Readability: ${scanServiceReadability}, SEO: ${scanServiceSEO}, Page Health: ${scanServicePageHealth}) would appear here.`);
-    }, 2000);
+    }
   };
 
   const handleSaveReport = () => {
@@ -74,7 +124,7 @@ export default function AdHocWebScanPage() {
 
   const handleTopUp = () => {
     setIsModalOpen(false);
-    window.location.href = '/settings#credits-subscription'; 
+    window.location.href = '/settings#credits-subscription';
   };
 
   const handleUpgrade = () => {
@@ -92,7 +142,7 @@ export default function AdHocWebScanPage() {
           </Button>
         </Link>
       </div>
-      
+
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -114,11 +164,11 @@ export default function AdHocWebScanPage() {
           )}
           <div>
             <Label htmlFor="url-input" className="text-base font-medium">Web Page URL</Label>
-            <Input 
-              id="url-input" 
-              type="url" 
-              placeholder="https://example.com/page" 
-              className="mt-1" 
+            <Input
+              id="url-input"
+              type="url"
+              placeholder="https://example.com/page"
+              className="mt-1"
               aria-describedby="url-input-description"
               value={urlToScan}
               onChange={(e) => setUrlToScan(e.target.value)}
@@ -143,9 +193,9 @@ export default function AdHocWebScanPage() {
                 </p>
                 <div className="space-y-3 mb-4">
                   <div className="flex items-start space-x-2">
-                    <Checkbox 
-                      id="scanServiceAccessibility" 
-                      checked={scanServiceAccessibility} 
+                    <Checkbox
+                      id="scanServiceAccessibility"
+                      checked={scanServiceAccessibility}
                       onCheckedChange={(checked) => setScanServiceAccessibility(Boolean(checked))}
                       aria-labelledby="scanServiceAccessibility-label"
                     />
@@ -160,9 +210,9 @@ export default function AdHocWebScanPage() {
                   </div>
 
                   <div className="flex items-start space-x-2">
-                    <Checkbox 
-                      id="scanServiceReadability" 
-                      checked={scanServiceReadability} 
+                    <Checkbox
+                      id="scanServiceReadability"
+                      checked={scanServiceReadability}
                       onCheckedChange={(checked) => setScanServiceReadability(Boolean(checked))}
                       aria-labelledby="scanServiceReadability-label"
                     />
@@ -177,15 +227,15 @@ export default function AdHocWebScanPage() {
                   </div>
 
                   <div className="flex items-start space-x-2">
-                    <Checkbox 
-                      id="scanServiceSEO" 
-                      checked={scanServiceSEO} 
+                    <Checkbox
+                      id="scanServiceSEO"
+                      checked={scanServiceSEO}
                       onCheckedChange={(checked) => setScanServiceSEO(Boolean(checked))}
                       aria-labelledby="scanServiceSEO-label"
                     />
                     <div className="grid gap-1.5 leading-none">
                       <Label htmlFor="scanServiceSEO" id="scanServiceSEO-label" className="font-medium cursor-pointer">
-                        Core SEO &amp; Metadata
+                        Core SEO & Metadata
                       </Label>
                       <p className="text-xs text-muted-foreground">
                         Checks basic SEO metadata (titles, descriptions, OG tags, etc.).
@@ -194,9 +244,9 @@ export default function AdHocWebScanPage() {
                   </div>
 
                   <div className="flex items-start space-x-2">
-                    <Checkbox 
-                      id="scanServicePageHealth" 
-                      checked={scanServicePageHealth} 
+                    <Checkbox
+                      id="scanServicePageHealth"
+                      checked={scanServicePageHealth}
                       onCheckedChange={(checked) => setScanServicePageHealth(Boolean(checked))}
                       aria-labelledby="scanServicePageHealth-label"
                     />
@@ -243,10 +293,56 @@ export default function AdHocWebScanPage() {
             <CardDescription>This is a temporary report view for your ad hoc scan. Save it to retain access.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Alert variant="default">
-              <AlertTitle>Scan Completed</AlertTitle>
-              <AlertDescription>{scanResult}</AlertDescription>
-            </Alert>
+            {typeof scanResult === 'string' ? (
+              <Alert variant="default">
+                <AlertTitle>Scan Status</AlertTitle>
+                <AlertDescription>{scanResult}</AlertDescription>
+              </Alert>
+            ) : (
+              scanResult && scanResult.summary && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Scan Summary:</h3>
+                  <p><strong>URL:</strong> {scanResult.summary.URL}</p>
+                  <p><strong>Rule Archive:</strong> {scanResult.summary.ruleArchive}</p>
+                  <p><strong>Policies:</strong> {scanResult.summary.policies.join(', ')}</p>
+                  {scanResult.summary.counts && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-red-600">{scanResult.summary.counts.violation}</p>
+                        <p className="text-sm text-muted-foreground">Violations</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-orange-500">{scanResult.summary.counts.potentialviolation}</p>
+                        <p className="text-sm text-muted-foreground">Potential Violations</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-yellow-500">{scanResult.summary.counts.recommendation}</p>
+                        <p className="text-sm text-muted-foreground">Recommendations</p>
+                      </div>
+                       <div className="text-center">
+                        <p className="text-2xl font-bold text-blue-500">{scanResult.summary.counts.manual}</p>
+                        <p className="text-sm text-muted-foreground">Manual Checks</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {scanResult.results && scanResult.results.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-md font-semibold">Sample Issues ({Math.min(scanResult.results.length, 5)} of {scanResult.results.length}):</h4>
+                      {scanResult.results.slice(0, 5).map((issue: any, index: number) => (
+                        <div key={index} className="border rounded-md p-3 text-sm bg-muted/50">
+                          <p><strong>Rule ID:</strong> {issue.ruleId}</p>
+                          <p><strong>Level:</strong> {issue.level}</p>
+                          <p><strong>Message:</strong> {issue.message}</p>
+                          {issue.snippet && <p><strong>Snippet:</strong> <code>{issue.snippet}</code></p>}
+                          {issue.path?.dom && <p><strong>DOM Path:</strong> <code>{issue.path.dom}</code></p>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            )}
             <div className="flex gap-2">
               <Button onClick={handleSaveReport} variant="outline">
                 <Save className="mr-2 h-4 w-4" /> Save Report to History
@@ -264,7 +360,7 @@ export default function AdHocWebScanPage() {
         <CardHeader>
           <CardTitle>Understanding Your Results</CardTitle>
           <CardDescription>
-            Our automated checks cover many common accessibility issues based on WCAG guidelines. 
+            Our automated checks cover many common accessibility issues based on WCAG guidelines.
             However, manual testing is crucial for comprehensive compliance.
           </CardDescription>
         </CardHeader>
@@ -281,8 +377,8 @@ export default function AdHocWebScanPage() {
             </ul>
           </div>
            <div className="relative aspect-video rounded-md overflow-hidden">
-            <Image 
-              src="https://placehold.co/600x338.png" 
+            <Image
+              src="https://placehold.co/600x338.png"
               alt="Placeholder image depicting a code scanning process"
               data-ai-hint="code scan"
               layout="fill"
@@ -305,4 +401,3 @@ export default function AdHocWebScanPage() {
     </div>
   );
 }
-    
