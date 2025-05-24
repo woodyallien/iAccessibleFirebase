@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/firebase/config"; // Import auth
+import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from "firebase/auth"; // Import Firebase auth functions and Google Auth
 import {
   Form,
   FormControl,
@@ -17,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { useRouter } from 'next/navigation'; // Import useRouter
 import { AuthLayout } from "@/components/layout/auth-layout";
 import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, User, Loader2 } from "lucide-react"; // Added Loader2
@@ -53,6 +56,7 @@ const formSchema = z.object({
 
 export default function SignUpPage() {
   const { toast } = useToast();
+  const router = useRouter(); // Get router instance
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -66,42 +70,111 @@ export default function SignUpPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     console.log("Signing up with:", values);
-    // TODO: Implement actual sign-up logic
-    setTimeout(() => {
-      const success = Math.random() > 0.3; // 70% chance of success
-      if (success) {
-        toast({
-          title: "Account Created Successfully",
-          description: "Welcome to iAccessible! Please sign in.",
-        });
-        form.reset();
-        // TODO: Redirect to sign-in page or dashboard
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      
+      // Update user profile with full name
+      await updateProfile(userCredential.user, {
+        displayName: values.fullName,
+      });
+
+      console.log("User signed up:", userCredential.user);
+      toast({
+        title: "Account Created Successfully",
+        description: "Please sign in.",
+      });
+      form.reset();
+      router.push('/auth/sign-in'); // Redirect to sign-in page
+
+    } catch (error: any) {
+      console.error("Sign up error:", error);
+      let errorMessage = "Sign-up failed. Please try again."; // Generic fallback
+
+      // Specific error handling based on Firebase Auth error codes
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "Email already in use.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "Password is too weak.";
+      }
+      // Add other specific error codes if needed
+
+      toast({
+        title: "Sign Up Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleGoogleSignUp() {
+    setIsSubmitting(true); // Disable button during Google sign-up
+    console.log("Attempting Google Sign Up...");
+    
+    const provider = new GoogleAuthProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      
+      // Check if the user is new
+      const additionalUserInfo = getAdditionalUserInfo(result);
+      if (additionalUserInfo?.isNewUser) {
+        console.log("New Google user signed up:", user);
+        // TODO: Perform any first-time setup for new Google users if needed
       } else {
+        console.log("Existing Google user signed in:", user);
+      }
+
+      toast({
+        title: "Signed up with Google successfully!",
+        description: "Welcome to iAccessible!",
+      });
+      router.push('/'); // Redirect to dashboard or intended page after sign up
+
+    } catch (error: any) {
+      console.error("Google Sign Up error:", error);
+      let errorMessage = "Google Sign-Up failed."; // Generic fallback
+
+      // Handle specific errors
+      if (error.code === 'auth/popup-closed-by-user') {
+        console.log("Google Sign Up popup closed by user.");
+        // No toast needed for this common user action
+      } else if (error.code === 'auth/cancelled-popup-request') {
+         console.log("Google Sign Up popup request cancelled.");
+         // No toast needed
+      }
+      else if (error.code === 'auth/account-exists-with-different-credential') {
+        errorMessage = "This email might be associated with another sign-in method.";
         toast({
           title: "Sign Up Failed",
-          description: "Could not create your account. The email might already be in use or an unexpected error occurred.",
+          description: errorMessage,
           variant: "destructive",
         });
       }
-      setIsSubmitting(false);
-    }, 1500);
-  }
-
-  function handleGoogleSignUp() {
-    console.log("Attempting Google Sign Up...");
-    // TODO: Implement Google OAuth logic for sign-up
-     toast({
-        title: "Google Sign-Up",
-        description: "Google Sign-Up functionality is not yet implemented.",
-        variant: "default"
-    })
+      // Add other specific error codes if needed
+      else {
+         toast({
+          title: "Sign Up Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsSubmitting(false); // Re-enable button
+    }
   }
 
   return (
-    <AuthLayout>
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Create your iAccessible Account</CardTitle>
@@ -238,6 +311,5 @@ export default function SignUpPage() {
           </p>
         </CardFooter>
       </Card>
-    </AuthLayout>
   );
 }

@@ -4,8 +4,10 @@ import { Outfit, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AppLayout } from '@/components/layout/app-layout';
+import { ConditionalLayoutWrapper } from '@/components/layout/conditional-layout-wrapper';
 import { siteConfig } from '@/config/site';
 import { CreditProvider } from '@/contexts/credit-context';
+import { AuthProvider } from '@/contexts/auth-context'; // Import AuthProvider
 
 const outfit = Outfit({
   variable: '--font-outfit',
@@ -28,35 +30,35 @@ export const metadata: Metadata = {
   keywords: ["accessibility", "MVP", "Next.js", "React", "Tailwind CSS"],
   authors: [{ name: "Your Name/Company", url: siteConfig.url }],
   creator: "Your Name/Company",
-  // openGraph: {
-  //   type: "website",
-  //   locale: "en_US",
-  //   url: siteConfig.url,
-  //   title: siteConfig.name,
-  //   description: siteConfig.description,
-  //   siteName: siteConfig.name,
-  //   images: [
-  //     {
-  //       url: siteConfig.ogImage,
-  //       width: 1200,
-  //       height: 630,
-  //       alt: siteConfig.name,
-  //     },
-  //   ],
-  // },
-  // twitter: {
-  //   card: "summary_large_image",
-  //   title: siteConfig.name,
-  //   description: siteConfig.description,
-  //   images: [siteConfig.ogImage],
-  //   creator: "@yourtwitterhandle",
-  // },
-  // icons: {
-  //   icon: "/favicon.ico",
-  //   shortcut: "/favicon-16x16.png",
-  //   apple: "/apple-touch-icon.png",
-  // },
-  // manifest: `${siteConfig.url}/site.webmanifest`,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+    creator: "@yourtwitterhandle",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: `${siteConfig.url}/site.webmanifest`,
 };
 
 export default function RootLayout({
@@ -73,11 +75,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CreditProvider>
-            <AppLayout>
-              {children}
-            </AppLayout>
-          </CreditProvider>
+          <AuthProvider>
+            <CreditProvider>
+              <ConditionalLayoutWrapper>
+                {children}
+              </ConditionalLayoutWrapper>
+            </CreditProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

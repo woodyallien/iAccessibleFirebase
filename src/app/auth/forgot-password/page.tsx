@@ -20,6 +20,8 @@ import { AuthLayout } from "@/components/layout/auth-layout";
 import { Mail, ArrowLeft, Loader2 } from "lucide-react"; // Added Loader2
 import { useToast } from "@/hooks/use-toast";
 import React from "react"; // Added React for useState if needed, but react-hook-form handles isSubmitting
+import { auth } from "@/lib/firebase/config"; // Import auth
+import { sendPasswordResetEmail } from "firebase/auth"; // Import sendPasswordResetEmail
 
 const formSchema = z.object({
   email: z.string().email({
@@ -39,31 +41,39 @@ export default function ForgotPasswordPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // setIsSubmitting(true); // Handled by react-hook-form
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // form.formState.isSubmitting is handled by react-hook-form automatically for async functions
     console.log("Submitting password reset request for:", values.email);
-    // TODO: Implement actual password reset logic
-    
-    // Simulate API call
-    // No explicit setIsSubmitting(true) needed if using form.formState.isSubmitting for button state
-    setTimeout(() => {
+
+    try {
+      await sendPasswordResetEmail(auth, values.email);
+      
+      // Show generic success toast regardless of whether email exists for security
       toast({
-          title: "Password Reset Email Sent",
+          title: "Password Reset Request Sent",
           description: "If an account with that email exists, a password reset link has been sent.",
           variant: "default",
       });
       form.reset(); // Reset form on submission
-      // setIsSubmitting(false); // Handled by react-hook-form
-    }, 1500);
+
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      // Show generic failure toast for any unexpected errors
+      toast({
+          title: "Password Reset Failed",
+          description: "An error occurred while trying to send the reset email. Please try again.",
+          variant: "destructive",
+      });
+    }
+    // form.formState.isSubmitting is automatically set to false by react-hook-form after async function completes
   }
 
   return (
-    <AuthLayout>
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Reset Your Password</CardTitle>
           <CardDescription>
-            Enter your account email and we&apos;ll send you a link to reset your password.
+            Enter your account email and we'll send you a link to reset your password.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -78,10 +88,10 @@ export default function ForgotPasswordPage() {
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <FormControl>
-                        <Input 
-                          type="email" 
-                          placeholder="you@example.com" 
-                          {...field} 
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          {...field}
                           className="pl-10"
                           aria-describedby="email-message"
                           disabled={form.formState.isSubmitting}
@@ -106,6 +116,5 @@ export default function ForgotPasswordPage() {
           </Link>
         </CardFooter>
       </Card>
-    </AuthLayout>
   );
 }

@@ -21,6 +21,9 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
+import { auth } from "@/lib/firebase/config"; // Import auth
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from "firebase/auth"; // Import Firebase auth functions and Google Auth
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 const formSchema = z.object({
   email: z.string().email({
@@ -44,6 +47,7 @@ const GoogleIcon = () => (
 
 export default function SignInPage() {
   const { toast } = useToast();
+  const router = useRouter(); // Get router instance
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -54,43 +58,133 @@ export default function SignInPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     console.log("Signing in with:", values);
-    // TODO: Implement actual sign-in logic
-    setTimeout(() => {
-      // Simulate API call success/failure
-      const success = Math.random() > 0.3; // 70% chance of success
-      if (success) {
-        toast({
-          title: "Signed In Successfully",
-          description: "Welcome back!",
-        });
-        // form.reset(); // Optional: reset form on success
-        // TODO: Redirect to dashboard or intended page
+
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      
+      console.log("User signed in successfully");
+      toast({
+        title: "Signed In Successfully!",
+        description: "Welcome back!",
+      });
+      // form.reset(); // Optional: reset form on success
+      router.push('/'); // Redirect to dashboard
+
+    } catch (error: any) {
+      console.error("Sign in error:", error);
+      let errorMessage = "Sign-in failed. Please try again."; // Generic fallback
+
+      switch (error.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          errorMessage = "Invalid email or password. Please try again.";
+          break;
+        case 'auth/invalid-email':
+          errorMessage = "The email address is not valid.";
+          break;
+        case 'auth/user-disabled':
+          errorMessage = "This user account has been disabled.";
+          break;
+        default:
+          // Log unexpected errors for debugging
+          console.error("Unexpected sign-in error code:", error.code);
+          errorMessage = "An unexpected error occurred during sign-in. Please try again later.";
+      }
+
+      toast({
+        title: "Sign In Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setIsSubmitting(true); // Disable button during Google sign-in
+    console.log("Attempting Google Sign In...");
+
+    const provider = new GoogleAuthProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+
+      // Check if the user is new
+      const additionalUserInfo = getAdditionalUserInfo(result);
+      if (additionalUserInfo?.isNewUser) {
+        console.log("New Google user signed up:", user);
+        // TODO: Perform any first-time setup for new Google users if needed
       } else {
+        console.log("Existing Google user signed in:", user);
+      }
+
+      toast({
+        title: "Signed in with Google successfully!",
+        description: "Welcome back!",
+      });
+      router.push('/'); // Redirect to dashboard
+
+    } catch (error: any) {
+      console.error("Google Sign In error:", error);
+      let errorMessage = "Google Sign-In failed. Please try again."; // Generic fallback
+
+      switch (error.code) {
+        case 'auth/popup-closed-by-user':
+          console.log("Google Sign In popup closed by user.");
+          // No toast needed for this common user action
+          errorMessage = ""; // Clear error message for no toast
+          break;
+        case 'auth/cancelled-popup-request':
+          console.log("Google Sign In popup request cancelled.");
+          // No toast needed
+          errorMessage = ""; // Clear error message for no toast
+          break;
+        case 'auth/account-exists-with-different-credential':
+          errorMessage = "This email might be associated with another sign-in method.";
+          break;
+        case 'auth/auth-domain-config-required':
+          errorMessage = "Firebase Auth domain is not configured.";
+          break;
+        case 'auth/operation-not-allowed':
+          errorMessage = "Google sign-in is not enabled in Firebase console.";
+          break;
+        case 'auth/operation-not-supported-in-this-environment':
+          errorMessage = "Google sign-in is not supported in this environment.";
+          break;
+        case 'auth/timeout':
+          errorMessage = "Google sign-in timed out. Please try again.";
+          break;
+        default:
+          // Log unexpected errors for debugging
+          console.error("Unexpected Google sign-in error code:", error.code);
+          errorMessage = "An unexpected error occurred during Google sign-in. Please try again later.";
+      }
+
+      // Only show toast if there's an error message
+      if (errorMessage) {
         toast({
           title: "Sign In Failed",
-          description: "Invalid email or password. Please try again.",
+          description: errorMessage,
           variant: "destructive",
         });
       }
-      setIsSubmitting(false);
-    }, 1500);
-  }
 
-  function handleGoogleSignIn() {
-    console.log("Attempting Google Sign In...");
-    // TODO: Implement Google OAuth logic
-    toast({
-        title: "Google Sign-In",
-        description: "Google Sign-In functionality is not yet implemented.",
-        variant: "default"
-    })
+    } finally {
+      setIsSubmitting(false); // Re-enable button
+    }
   }
 
   return (
-    <AuthLayout>
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Sign In to iAccessible</CardTitle>
@@ -108,10 +202,10 @@ export default function SignInPage() {
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <FormControl>
-                        <Input 
-                          type="email" 
-                          placeholder="you@example.com" 
-                          {...field} 
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          {...field}
                           className="pl-10"
                           aria-describedby="email-message"
                           disabled={isSubmitting}
@@ -131,10 +225,10 @@ export default function SignInPage() {
                      <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <FormControl>
-                        <Input 
-                          type="password" 
-                          placeholder="••••••••" 
-                          {...field} 
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
                           className="pl-10"
                           aria-describedby="password-message"
                           disabled={isSubmitting}
@@ -176,13 +270,12 @@ export default function SignInPage() {
         </CardContent>
         <CardFooter className="justify-center">
           <p className="text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Don't have an account?{" "}
             <Link href="/auth/sign-up" className="font-semibold text-primary hover:underline">
               Sign Up
             </Link>
           </p>
         </CardFooter>
       </Card>
-    </AuthLayout>
   );
 }
